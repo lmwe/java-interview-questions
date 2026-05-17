@@ -370,7 +370,7 @@ const AiToolCard = ({ tool }: { tool: AiLink }) => (
 
 const Home = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const featuredQuestions = questions.slice(0, 6);
+  const featuredQuestions = questions.slice(0, 10);
   
   const getCategoryName = (categoryId: string) => {
     const cat = categories.find(c => c.id === categoryId);
@@ -405,23 +405,6 @@ const Home = () => {
       
       {/* Main Content */}
       <div className="md:ml-64 pb-20 sm:pb-0">
-        {/* AI Tools Navigation */}
-        <section id="ai-tools" className="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 py-8 sm:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3 flex items-center justify-center">
-                <span className="mr-2 sm:mr-3">🤖</span> AI工具导航
-              </h2>
-              <p className="text-indigo-200 text-sm sm:text-lg">精心整理的热门AI工具，助力开发者提升效率</p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
-              {aiTools.map((tool) => (
-                <AiToolCard key={tool.name} tool={tool} />
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Hero Section */}
         <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
@@ -434,10 +417,10 @@ const Home = () => {
               </p>
               <div className="flex justify-center space-x-4">
                 <a 
-                  href="#backend" 
+                  href="#questions" 
                   className="bg-white text-blue-900 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg text-sm sm:text-base"
                 >
-                  开始学习
+                  开始刷题
                 </a>
               </div>
             </div>
@@ -445,47 +428,10 @@ const Home = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
-          {/* Official Documentation Links */}
-          <section id="docs" className="mb-8 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 text-center">
-              🔧 开发工具箱
-            </h2>
-            <p className="text-gray-600 text-center mb-6 sm:mb-8 text-sm sm:text-base">
-              Java开发者必备的官方文档和工具，包含详细使用教程
-            </p>
-            
-            <ToolSection id="backend" title="🖥️ 后端开发工具" tools={backendTools} />
-            <ToolSection id="frontend" title="🌐 前端开发工具" tools={frontendTools} />
-            <ToolSection id="devops" title="🔧 DevOps工具" tools={devopsTools} />
-            <ToolSection id="wechat" title="💬 微信生态" tools={wechatTools} />
-          </section>
-
-          {/* Categories Section */}
-          <section id="categories" className="mb-8 sm:mb-16 scroll-mt-24">
+          {/* Featured Questions - First Priority */}
+          <section id="questions" className="mb-12 sm:mb-20 scroll-mt-24">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
-              📚 知识分类
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {categories.map((category) => (
-                <Link 
-                  key={category.id}
-                  to={`/category/${category.id}`}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 border border-gray-100 group"
-                >
-                  <div className={`w-12 h-12 sm:w-14 sm:h-14 ${category.color} rounded-lg flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-200`}>
-                    {category.icon}
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
-                  <p className="text-gray-600 text-sm">{category.description}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Featured Questions */}
-          <section id="questions" className="scroll-mt-24">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
-              🎯 精选题目
+              🎯 精选面试题
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {featuredQuestions.map((question) => (
@@ -531,6 +477,60 @@ const Home = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
+            </div>
+          </section>
+
+          {/* Categories Section */}
+          <section id="categories" className="mb-8 sm:mb-16 scroll-mt-24">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
+              📚 知识分类
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {categories.map((category) => (
+                <Link 
+                  key={category.id}
+                  to={`/category/${category.id}`}
+                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 border border-gray-100 group"
+                >
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 ${category.color} rounded-lg flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-200`}>
+                    {category.icon}
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
+                  <p className="text-gray-600 text-sm">{category.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Official Documentation Links */}
+          <section id="docs" className="mb-8 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 text-center">
+              🔧 开发工具箱
+            </h2>
+            <p className="text-gray-600 text-center mb-6 sm:mb-8 text-sm sm:text-base">
+              Java开发者必备的官方文档和工具，包含详细使用教程
+            </p>
+            
+            <ToolSection id="backend" title="🖥️ 后端开发工具" tools={backendTools} />
+            <ToolSection id="frontend" title="🌐 前端开发工具" tools={frontendTools} />
+            <ToolSection id="devops" title="🔧 DevOps工具" tools={devopsTools} />
+            <ToolSection id="wechat" title="💬 微信生态" tools={wechatTools} />
+          </section>
+
+          {/* AI Tools Navigation - Moved to bottom */}
+          <section id="ai-tools" className="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 py-8 sm:py-12 rounded-2xl">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3 flex items-center justify-center">
+                  <span className="mr-2 sm:mr-3">🤖</span> AI工具导航
+                </h2>
+                <p className="text-indigo-200 text-sm sm:text-lg">精心整理的热门AI工具，助力开发者提升效率</p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
+                {aiTools.map((tool) => (
+                  <AiToolCard key={tool.name} tool={tool} />
+                ))}
+              </div>
             </div>
           </section>
         </div>
