@@ -197,5 +197,541 @@ public void reader() {
     }
 }`,
     tags: ['JVM', '并发']
+  },
+  {
+    id: '11',
+    title: 'Spring Boot自动配置原理是什么？',
+    content: '详细解释Spring Boot的自动配置机制，包括@SpringBootApplication注解、@EnableAutoConfiguration、spring.factories文件等。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: 'Spring Boot自动配置通过@EnableAutoConfiguration注解，利用SpringFactoriesLoader加载META-INF/spring.factories文件中定义的自动配置类，根据@Conditional条件注解判断是否生效，最终将Bean注册到容器中。',
+    codeExample: `// @SpringBootApplication包含了三个注解
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+
+// 自定义自动配置
+@Configuration
+@ConditionalOnClass(SomeClass.class)
+@EnableConfigurationProperties(MyProperties.class)
+public class MyAutoConfiguration {
+    @Bean
+    @ConditionalOnMissingBean
+    public MyBean myBean() {
+        return new MyBean();
+    }
+}`,
+    tags: ['Spring Boot', '自动配置']
+  },
+  {
+    id: '12',
+    title: '什么是微服务？微服务的优缺点是什么？',
+    content: '解释微服务架构的概念、特点、与单体架构的区别，以及微服务的优缺点。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: '微服务是将应用拆分为多个小型、独立部署的服务，每个服务专注于单一业务功能，通过轻量级通信机制协作。优点：独立部署、技术栈灵活、易于扩展。缺点：运维复杂、分布式事务、服务调用开销。',
+    codeExample: `// 简单的Spring Boot微服务
+@SpringBootApplication
+@RestController
+public class UserService {
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable Long id) {
+        // 从数据库查询用户
+        return new User(id, "张三");
+    }
+}
+
+// 使用Feign调用其他微服务
+@FeignClient(name = "order-service")
+public interface OrderClient {
+    @GetMapping("/orders/user/{userId}")
+    List<Order> getOrdersByUserId(@PathVariable Long userId);
+}`,
+    tags: ['微服务', '架构设计']
+  },
+  {
+    id: '13',
+    title: 'Redis的数据结构有哪些？应用场景是什么？',
+    content: '介绍Redis的主要数据结构及其应用场景，包括String、Hash、List、Set、Sorted Set等。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'Redis支持String（缓存、计数器）、Hash（对象存储）、List（消息队列、栈）、Set（去重、交集）、Sorted Set（排行榜）、HyperLogLog（基数统计）、Bitmap（用户签到）、Geo（地理位置）等数据结构。',
+    codeExample: `// String - 缓存用户信息
+set user:1 "{\"id\":1,\"name\":\"张三\"}"
+
+// Hash - 存储购物车
+hset cart:1 product:1001 2
+hset cart:1 product:1002 1
+
+// List - 消息队列
+lpush queue:order "order001"
+
+// Sorted Set - 排行榜
+zadd leaderboard 100 "user1"
+zadd leaderboard 200 "user2"`,
+    tags: ['Redis', '缓存']
+  },
+  {
+    id: '14',
+    title: '什么是Spring Cloud？常用组件有哪些？',
+    content: '介绍Spring Cloud的概念、作用以及常用的组件，如Eureka、Ribbon、Feign、Hystrix、Zuul/Gateway等。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: 'Spring Cloud是一套微服务开发工具集，提供服务发现（Eureka/Nacos）、负载均衡（Ribbon）、服务调用（Feign）、熔断器（Hystrix/Sentinel）、网关（Zuul/Gateway）、配置中心（Config）、链路追踪（Sleuth/Zipkin）等功能。',
+    codeExample: `// 服务注册与发现
+@EnableDiscoveryClient
+@SpringBootApplication
+public class ServiceApplication { }
+
+// Feign客户端
+@FeignClient("user-service")
+public interface UserClient {
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable("id") Long id);
+}
+
+// 网关路由配置
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**`,
+    tags: ['Spring Cloud', '微服务']
+  },
+  {
+    id: '15',
+    title: 'MySQL索引原理及B+树为什么适合做索引？',
+    content: '解释MySQL索引的底层数据结构，以及为什么InnoDB选择B+树而不是B树或红黑树。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: 'InnoDB使用B+树作为索引结构。B+树的优点：1)节点可以存储更多key，树更矮，IO次数少；2)查询性能稳定；3)叶子节点有链表，范围查询高效；4)全表扫描更快。相比B树，B+树只有叶子节点存数据，非叶子节点只存索引，内存利用率更高。',
+    codeExample: `-- 创建索引
+CREATE INDEX idx_username ON users(username);
+
+-- 联合索引
+CREATE INDEX idx_name_age ON users(name, age);
+
+-- 查看索引
+SHOW INDEX FROM users;
+
+-- 使用EXPLAIN分析查询
+EXPLAIN SELECT * FROM users WHERE username = '张三';`,
+    tags: ['MySQL', '索引']
+  },
+  {
+    id: '16',
+    title: 'JVM垃圾回收机制和常用垃圾回收器',
+    content: '详细解释JVM垃圾回收的原理、常用算法（标记清除、复制、标记整理、分代收集）以及常用GC器。',
+    category: 'jvm',
+    difficulty: 'hard',
+    answer: 'JVM垃圾回收识别不再被引用的对象并回收内存。常用算法：标记清除（产生碎片）、复制（年轻代，无碎片但需额外空间）、标记整理（老年代）、分代收集（年轻代+老年代）。常用GC器：Serial、Parallel、CMS、G1、ZGC、Shenandoah。',
+    codeExample: `// JVM参数配置
+-XX:+UseG1GC           # 使用G1收集器
+-XX:MaxGCPauseMillis=200 # 最大GC停顿时间
+-XX:+HeapDumpOnOutOfMemoryError # OOM时dump堆
+-Xms4g -Xmx4g         # 初始和最大堆大小
+
+// 查看GC日志
+-XX:+PrintGCDetails
+-XX:+PrintGCDateStamps
+-Xloggc:gc.log`,
+    tags: ['JVM', 'GC']
+  },
+  {
+    id: '17',
+    title: '什么是分布式事务？解决方案有哪些？',
+    content: '解释分布式事务的概念、问题，以及常见的解决方案如2PC、3PC、TCC、Saga、本地消息表、Seata等。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: '分布式事务是跨多个数据库或服务的事务，需要保证ACID特性。解决方案：2PC（两阶段提交）、3PC（三阶段）、TCC（Try-Confirm-Cancel）、Saga（长期事务）、本地消息表、Seata（AT/TCC/Saga模式）等。',
+    codeExample: `// Seata AT模式示例
+@GlobalTransactional
+public void createOrder(Order order) {
+    // 1. 扣库存
+    inventoryService.deduct(order.getProductId(), order.getCount());
+    // 2. 创建订单
+    orderService.create(order);
+    // 3. 扣余额
+    accountService.debit(order.getUserId(), order.getAmount());
+}
+
+// TCC模式
+public interface TccService {
+    @TwoPhaseBusinessAction(name = "tccAction", commitMethod = "commit", rollbackMethod = "rollback")
+    void try(BusinessActionContext context);
+    void commit(BusinessActionContext context);
+    void rollback(BusinessActionContext context);
+}`,
+    tags: ['分布式', '事务']
+  },
+  {
+    id: '18',
+    title: 'Kafka的架构和原理是什么？',
+    content: '介绍Kafka的核心概念（Producer、Consumer、Broker、Topic、Partition、Offset）和架构原理。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: 'Kafka是分布式消息系统，采用发布-订阅模式。核心组件：Producer（生产者）、Consumer（消费者）、Broker（服务器）、Topic（主题）、Partition（分区）、Replica（副本）、Consumer Group（消费组）、Offset（偏移量）。特点：高吞吐、持久化、分布式。',
+    codeExample: `// 生产者
+Properties props = new Properties();
+props.put("bootstrap.servers", "localhost:9092");
+props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+Producer<String, String> producer = new KafkaProducer<>(props);
+producer.send(new ProducerRecord<>("topic", "key", "value"));
+
+// 消费者
+@KafkaListener(topics = "topic", groupId = "group")
+public void listen(String message) {
+    System.out.println("收到消息: " + message);
+}`,
+    tags: ['Kafka', '消息队列']
+  },
+  {
+    id: '19',
+    title: '如何保证接口的幂等性？',
+    content: '解释幂等性的概念，以及常见的保证接口幂等性的方案（唯一索引、Token机制、悲观锁、乐观锁、分布式锁等）。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: '幂等性指同一请求多次执行产生的结果一致。解决方案：1)唯一索引（防止重复插入）；2)Token机制（防重复提交）；3)数据库乐观锁（version字段）；4)Redis分布式锁；5)状态机（状态只能单向变更）。',
+    codeExample: `// 1. Token机制
+@GetMapping("/token")
+public String getToken() {
+    String token = UUID.randomUUID().toString();
+    redisTemplate.opsForValue().set(token, "1", 30, TimeUnit.SECONDS);
+    return token;
+}
+
+@PostMapping("/order")
+public String createOrder(@RequestHeader("token") String token, @RequestBody Order order) {
+    Boolean exists = redisTemplate.delete(token);
+    if (!exists) {
+        return "请勿重复提交";
+    }
+    orderService.create(order);
+    return "成功";
+}
+
+// 2. 乐观锁
+@Update("UPDATE account SET balance = balance - #{amount}, version = version + 1 WHERE id = #{id} AND version = #{version}")
+int deduct(@Param("id") Long id, @Param("amount") BigDecimal amount, @Param("version") Integer version);`,
+    tags: ['幂等性', '高并发']
+  },
+  {
+    id: '20',
+    title: 'ThreadLocal的原理和内存泄漏问题',
+    content: '解释ThreadLocal的工作原理、使用场景，以及为什么会产生内存泄漏，如何避免。',
+    category: 'concurrent',
+    difficulty: 'hard',
+    answer: 'ThreadLocal提供线程本地变量，每个线程都有独立副本。原理：Thread内部有ThreadLocalMap，key是ThreadLocal对象（弱引用），value是线程本地值。内存泄漏原因：key是弱引用会被GC回收，但value是强引用，线程不结束value不会回收，需手动调用remove()。',
+    codeExample: `// ThreadLocal使用
+public class UserContext {
+    private static final ThreadLocal<User> USER_THREAD_LOCAL = new ThreadLocal<>();
+    
+    public static void setUser(User user) {
+        USER_THREAD_LOCAL.set(user);
+    }
+    
+    public static User getUser() {
+        return USER_THREAD_LOCAL.get();
+    }
+    
+    public static void clear() {
+        USER_THREAD_LOCAL.remove(); // 防止内存泄漏！
+    }
+}
+
+// 在过滤器中使用
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+    try {
+        User user = getCurrentUser(request);
+        UserContext.setUser(user);
+        chain.doFilter(request, response);
+    } finally {
+        UserContext.clear(); // 必须清理！
+    }
+}`,
+    tags: ['并发', 'ThreadLocal']
+  },
+  {
+    id: '21',
+    title: '什么是限流？常用的限流算法有哪些？',
+    content: '解释限流的概念和作用，以及常见的限流算法（固定窗口、滑动窗口、漏桶、令牌桶）的实现原理。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: '限流是限制系统请求速率，防止过载。常用算法：1)固定窗口计数器（简单但有临界问题）；2)滑动窗口（更平滑）；3)漏桶（恒定速率处理）；4)令牌桶（允许突发流量）。常用实现：Guava RateLimiter、Redis + Lua脚本、Sentinel。',
+    codeExample: `// Guava RateLimiter
+RateLimiter limiter = RateLimiter.create(10.0); // 每秒10个令牌
+if (limiter.tryAcquire()) {
+    // 处理请求
+}
+
+// Redis + Lua 滑动窗口
+local key = KEYS[1]
+local window = tonumber(ARGV[1])
+local limit = tonumber(ARGV[2])
+local currentTime = tonumber(ARGV[3])
+
+redis.call('ZREMRANGEBYSCORE', key, 0, currentTime - window)
+local count = redis.call('ZCARD', key)
+if count < limit then
+    redis.call('ZADD', key, currentTime, currentTime)
+    redis.call('EXPIRE', key, window + 1)
+    return 1
+else
+    return 0
+end`,
+    tags: ['限流', '高并发']
+  },
+  {
+    id: '22',
+    title: 'Spring中的循环依赖问题及解决方案',
+    content: '解释什么是循环依赖，Spring是如何解决循环依赖问题的（三级缓存）。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: '循环依赖是A依赖B，B又依赖A的情况。Spring通过三级缓存解决：1)一级缓存（singletonObjects）存完整Bean；2)二级缓存（earlySingletonObjects）存刚实例化的Bean；3)三级缓存（singletonFactories）存ObjectFactory。关键是在Bean完全初始化前就暴露出来让其他Bean注入。',
+    codeExample: `// 循环依赖示例
+@Service
+public class A {
+    @Autowired
+    private B b;
+}
+
+@Service
+public class B {
+    @Autowired
+    private A a;
+}
+
+// 三级缓存源码（DefaultSingletonBeanRegistry）
+private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
+private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);`,
+    tags: ['Spring', '循环依赖']
+  },
+  {
+    id: '23',
+    title: '如何进行SQL优化？',
+    content: '介绍SQL优化的常用方法和技巧，包括索引优化、SQL语句优化、表结构优化等。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'SQL优化方法：1)建立合适的索引（避免全表扫描）；2)避免SELECT *；3)使用JOIN代替子查询；4)避免在WHERE子句使用函数或表达式；5)使用LIMIT分页；6)EXPLAIN分析执行计划；7)读写分离；8)使用覆盖索引。',
+    codeExample: `-- 不好的写法（索引失效）
+SELECT * FROM users WHERE YEAR(create_time) = 2024;
+SELECT * FROM users WHERE name LIKE '%张%';
+
+-- 好的写法
+SELECT * FROM users WHERE create_time >= '2024-01-01' AND create_time < '2025-01-01';
+SELECT * FROM users WHERE name LIKE '张%';
+
+-- 使用覆盖索引
+CREATE INDEX idx_name_age ON users(name, age);
+SELECT name, age FROM users WHERE name = '张三'; -- 不需要回表
+
+-- EXPLAIN分析
+EXPLAIN SELECT * FROM users WHERE id = 1;`,
+    tags: ['SQL优化', 'MySQL']
+  },
+  {
+    id: '24',
+    title: '什么是ZooKeeper？有哪些应用场景？',
+    content: '介绍ZooKeeper的概念、特点、数据结构，以及常见的应用场景（分布式锁、配置中心、服务发现、Leader选举）。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'ZooKeeper是分布式协调服务，提供类似文件系统的树形数据结构。特点：有序节点、临时节点、Watcher通知、数据一致性。应用场景：分布式锁、配置中心、服务注册发现、Leader选举、分布式队列。',
+    codeExample: `// Curator实现分布式锁
+InterProcessMutex lock = new InterProcessMutex(client, "/locks/order");
+try {
+    if (lock.acquire(10, TimeUnit.SECONDS)) {
+        // 执行业务
+    }
+} finally {
+    lock.release();
+}
+
+// 监听节点变化
+client.getData().usingWatcher((CuratorWatcher) event -> {
+    System.out.println("节点变化: " + event.getType());
+}).forPath("/config");`,
+    tags: ['ZooKeeper', '分布式协调']
+  },
+  {
+    id: '25',
+    title: '什么是CAP理论？BASE理论？',
+    content: '解释CAP理论的三个要素（一致性、可用性、分区容错性），以及BASE理论（Basically Available、Soft state、Eventually consistent）。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'CAP理论：分布式系统中一致性（C）、可用性（A）、分区容错性（P）三者不可兼得，只能选两个。CP系统（HBase、MongoDB）优先保证一致性，AP系统（Cassandra、Eureka）优先保证可用性。BASE理论：基本可用、软状态、最终一致，是对CAP的折中。',
+    codeExample: `// Redis保证最终一致性（BASE）
+// 写入时先缓存，异步同步到数据库
+@CachePut(value = "user", key = "#user.id")
+public User update(User user) {
+    userDao.update(user);
+    // 异步消息通知其他节点
+    messageQueue.send("user:update", user.getId());
+    return user;
+}
+
+// 读取时先从缓存读
+@Cacheable(value = "user", key = "#id")
+public User getById(Long id) {
+    return userDao.findById(id);
+}`,
+    tags: ['CAP', '分布式理论']
+  },
+  {
+    id: '26',
+    title: '什么是分库分表？如何实现？',
+    content: '解释分库分表的原因、策略（水平分表、垂直分表、水平分库、垂直分库），以及常用中间件（ShardingSphere、MyCat）。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: '分库分表解决单库单表数据量过大的问题。策略：1)垂直分表（按列拆分）；2)水平分表（按行拆分，如哈希、范围分表）；3)垂直分库（按业务拆分库）；4)水平分库（数据分散到多个库）。常用中间件：ShardingSphere-JDBC/Proxy、MyCat。',
+    codeExample: `// ShardingSphere配置
+spring:
+  shardingsphere:
+    datasource:
+      names: ds0,ds1
+      ds0:
+        jdbc-url: jdbc:mysql://localhost:3306/db0
+        username: root
+      ds1:
+        jdbc-url: jdbc:mysql://localhost:3306/db1
+        username: root
+    sharding:
+      tables:
+        t_order:
+          actual-data-nodes: ds$->{0..1}.t_order_$->{0..1}
+          database-strategy:
+            inline:
+              sharding-column: user_id
+              algorithm-expression: ds$->{user_id % 2}
+          table-strategy:
+            inline:
+              sharding-column: order_id
+              algorithm-expression: t_order_$->{order_id % 2}`,
+    tags: ['分库分表', '数据库']
+  },
+  {
+    id: '27',
+    title: '什么是MySQL的事务隔离级别？',
+    content: '介绍SQL标准的四个事务隔离级别（读未提交、读已提交、可重复读、串行化）以及InnoDB的默认隔离级别。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: '四个隔离级别：1)READ UNCOMMITTED（读未提交）；2)READ COMMITTED（读已提交，Oracle默认）；3)REPEATABLE READ（可重复读，MySQL默认）；4)SERIALIZABLE（串行化）。InnoDB默认REPEATABLE READ，通过MVCC和Next-Key Lock解决幻读问题。',
+    codeExample: `-- 设置隔离级别
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+-- 查询当前隔离级别
+SELECT @@tx_isolation;
+
+-- MySQL 8.0+
+SELECT @@transaction_isolation;
+
+-- 开启事务
+BEGIN;
+-- 执行业务操作
+UPDATE account SET balance = balance - 100 WHERE id = 1;
+UPDATE account SET balance = balance + 100 WHERE id = 2;
+-- 提交事务
+COMMIT;`,
+    tags: ['MySQL', '事务']
+  },
+  {
+    id: '28',
+    title: '什么是Nginx？如何配置负载均衡？',
+    content: '介绍Nginx的功能和特点，以及如何配置Nginx实现反向代理和负载均衡。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'Nginx是高性能Web服务器和反向代理服务器。支持反向代理、负载均衡、静态资源服务、SSL/TLS、限流等。负载均衡策略：轮询（默认）、加权轮询、IP hash、least_conn、url_hash等。',
+    codeExample: `# Nginx配置
+http {
+    upstream backend {
+        server 192.168.1.10:8080 weight=3;
+        server 192.168.1.11:8080 weight=2;
+        server 192.168.1.12:8080 backup;
+    }
+
+    server {
+        listen 80;
+        server_name example.com;
+
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+}`,
+    tags: ['Nginx', '负载均衡']
+  },
+  {
+    id: '29',
+    title: '什么是Docker？Dockerfile常用指令？',
+    content: '介绍Docker的概念、核心组件（镜像、容器、仓库），以及Dockerfile常用指令。',
+    category: 'advanced',
+    difficulty: 'easy',
+    answer: 'Docker是容器化平台，将应用和依赖打包成容器。核心概念：Image（镜像）、Container（容器）、Repository（仓库）。Dockerfile常用指令：FROM、RUN、COPY、ADD、WORKDIR、EXPOSE、CMD、ENTRYPOINT、ENV、VOLUME等。',
+    codeExample: `# Dockerfile示例
+FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY target/myapp.jar app.jar
+EXPOSE 8080
+ENV JAVA_OPTS="-Xmx512m"
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# 构建镜像
+docker build -t myapp:1.0 .
+
+# 运行容器
+docker run -d -p 8080:8080 --name myapp myapp:1.0
+
+# Docker Compose
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"`,
+    tags: ['Docker', '容器化']
+  },
+  {
+    id: '30',
+    title: '什么是Netty？核心组件有哪些？',
+    content: '介绍Netty的概念、特点、应用场景，以及核心组件（EventLoop、Channel、ChannelPipeline、ChannelHandler等）。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: 'Netty是高性能异步事件驱动的网络框架。核心组件：1)EventLoop（事件循环，处理IO事件）；2)Channel（网络操作抽象）；3)ChannelPipeline（责任链模式）；4)ChannelHandler（业务逻辑处理）；5)ByteBuf（字节容器）。应用场景：RPC框架、游戏服务器、消息推送等。',
+    codeExample: `// Netty服务器
+ServerBootstrap bootstrap = new ServerBootstrap();
+bootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+    .channel(NioServerSocketChannel.class)
+    .childHandler(new ChannelInitializer<SocketChannel>() {
+        @Override
+        protected void initChannel(SocketChannel ch) {
+            ch.pipeline()
+                .addLast(new StringDecoder())
+                .addLast(new StringEncoder())
+                .addLast(new SimpleChannelInboundHandler<String>() {
+                    @Override
+                    protected void channelRead0(ChannelHandlerContext ctx, String msg) {
+                        System.out.println("收到: " + msg);
+                        ctx.writeAndFlush("收到你的消息");
+                    }
+                });
+        }
+    });
+bootstrap.bind(8080).sync();`,
+    tags: ['Netty', '网络编程']
   }
 ];
