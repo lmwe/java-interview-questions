@@ -606,15 +606,15 @@ spring:
     sharding:
       tables:
         t_order:
-          actual-data-nodes: ds$->{0..1}.t_order_$->{0..1}
+          actual-data-nodes: ds\${0..1}.t_order_\${0..1}
           database-strategy:
             inline:
               sharding-column: user_id
-              algorithm-expression: ds$->{user_id % 2}
+              algorithm-expression: ds\${user_id % 2}
           table-strategy:
             inline:
               sharding-column: order_id
-              algorithm-expression: t_order_$->{order_id % 2}`,
+              algorithm-expression: t_order_\${order_id % 2}`,
     tags: ['分库分表', '数据库']
   },
   {
@@ -663,9 +663,9 @@ http {
 
         location / {
             proxy_pass http://backend;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         }
     }
 }`,
@@ -968,7 +968,7 @@ spring:
 @RefreshScope
 @RestController
 public class ConfigController {
-    @Value("${app.name}")
+    @Value("\${app.name}")
     private String appName;
 }
 
