@@ -35,11 +35,13 @@ const QuestionDetail = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">题目不存在</h2>
-          <Link to="/" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
-            返回首页
-          </Link>
+        <div className="ml-64">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+            <h2 className="text-2xl font-bold text-gray-900">题目不存在</h2>
+            <Link to="/" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+              返回首页
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -49,152 +51,154 @@ const QuestionDetail = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <div className="flex items-center text-sm text-gray-500 space-x-2">
-            <Link to="/" className="hover:text-blue-600">首页</Link>
-            <span>/</span>
-            {category && (
-              <>
-                <Link to={`/category/${category.id}`} className="hover:text-blue-600">
-                  {category.name}
-                </Link>
-                <span>/</span>
-              </>
-            )}
-            <span className="text-gray-900">题目详情</span>
-          </div>
-        </div>
-
-        {/* Question Card */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 mb-8">
-          <div className="p-8">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                {category && (
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${category.color}`}>
-                    {category.icon} {category.name}
-                  </span>
-                )}
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(question.difficulty)}`}>
-                  {getDifficultyText(question.difficulty)}
-                </span>
-              </div>
-            </div>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">{question.title}</h1>
-            
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <p className="text-lg text-gray-800 leading-relaxed">{question.content}</p>
-            </div>
-
-            <div className="flex flex-wrap gap-2 mb-6">
-              {question.tags.map((tag, idx) => (
-                <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            {/* Show Answer Button */}
-            <button
-              onClick={() => setShowAnswer(!showAnswer)}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
-            >
-              <span>{showAnswer ? '收起答案' : '查看答案'}</span>
-              <svg 
-                className={`w-5 h-5 transition-transform duration-200 ${showAnswer ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Answer Section */}
-        {showAnswer && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 mb-8 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4">
-              <h2 className="text-xl font-bold flex items-center">
-                <span className="mr-2">💡</span> 参考答案
-              </h2>
-            </div>
-            <div className="p-8">
-              <div className="mb-8">
-                <p className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap">
-                  {question.answer}
-                </p>
-              </div>
-
-              {question.codeExample && (
-                <div className="mt-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <span className="mr-2">📝</span> 代码示例
-                  </h3>
-                  <div className="bg-gray-900 rounded-lg p-6 overflow-x-auto">
-                    <pre className="text-green-400 font-mono text-sm leading-relaxed">
-                      <code>{question.codeExample}</code>
-                    </pre>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Related Questions */}
-        {relatedQuestions.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100">
-            <div className="p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="mr-2">📚</span> 相关题目
-              </h2>
-              <div className="space-y-4">
-                {relatedQuestions.map((q) => (
-                  <Link 
-                    key={q.id}
-                    to={`/question/${q.id}`}
-                    className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
-                  >
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-medium text-gray-900">{q.title}</h3>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(q.difficulty)}`}>
-                        {getDifficultyText(q.difficulty)}
-                      </span>
-                    </div>
+      <div className="ml-64">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Breadcrumb */}
+          <div className="mb-6">
+            <div className="flex items-center text-sm text-gray-500 space-x-2">
+              <Link to="/" className="hover:text-blue-600">首页</Link>
+              <span>/</span>
+              {category && (
+                <>
+                  <Link to={`/category/${category.id}`} className="hover:text-blue-600">
+                    {category.name}
                   </Link>
+                  <span>/</span>
+                </>
+              )}
+              <span className="text-gray-900">题目详情</span>
+            </div>
+          </div>
+
+          {/* Question Card */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 mb-8">
+            <div className="p-8">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  {category && (
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${category.color}`}>
+                      {category.icon} {category.name}
+                    </span>
+                  )}
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(question.difficulty)}`}>
+                    {getDifficultyText(question.difficulty)}
+                  </span>
+                </div>
+              </div>
+              
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">{question.title}</h1>
+              
+              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <p className="text-lg text-gray-800 leading-relaxed">{question.content}</p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {question.tags.map((tag, idx) => (
+                  <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                    {tag}
+                  </span>
                 ))}
               </div>
+
+              {/* Show Answer Button */}
+              <button
+                onClick={() => setShowAnswer(!showAnswer)}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
+              >
+                <span>{showAnswer ? '收起答案' : '查看答案'}</span>
+                <svg 
+                  className={`w-5 h-5 transition-transform duration-200 ${showAnswer ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             </div>
           </div>
-        )}
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-8">
-          <Link 
-            to={`/category/${question.category}`}
-            className="text-blue-600 hover:text-blue-800 font-medium flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            返回分类
-          </Link>
+          {/* Answer Section */}
+          {showAnswer && (
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 mb-8 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4">
+                <h2 className="text-xl font-bold flex items-center">
+                  <span className="mr-2">💡</span> 参考答案
+                </h2>
+              </div>
+              <div className="p-8">
+                <div className="mb-8">
+                  <p className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap">
+                    {question.answer}
+                  </p>
+                </div>
+
+                {question.codeExample && (
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <span className="mr-2">📝</span> 代码示例
+                    </h3>
+                    <div className="bg-gray-900 rounded-lg p-6 overflow-x-auto">
+                      <pre className="text-green-400 font-mono text-sm leading-relaxed">
+                        <code>{question.codeExample}</code>
+                      </pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Related Questions */}
+          {relatedQuestions.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100">
+              <div className="p-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                  <span className="mr-2">📚</span> 相关题目
+                </h2>
+                <div className="space-y-4">
+                  {relatedQuestions.map((q) => (
+                    <Link 
+                      key={q.id}
+                      to={`/question/${q.id}`}
+                      className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between">
+                        <h3 className="font-medium text-gray-900">{q.title}</h3>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(q.difficulty)}`}>
+                          {getDifficultyText(q.difficulty)}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation */}
+          <div className="flex justify-between items-center mt-8">
+            <Link 
+              to={`/category/${question.category}`}
+              className="text-blue-600 hover:text-blue-800 font-medium flex items-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              返回分类
+            </Link>
+          </div>
         </div>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-gray-400 py-8">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <p className="text-sm">
+              © 2024 Java面试题. 帮助每一位开发者准备面试。
+            </p>
+          </div>
+        </footer>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-sm">
-            © 2024 Java面试题. 帮助每一位开发者准备面试。
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };
