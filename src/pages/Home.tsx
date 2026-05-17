@@ -2,7 +2,87 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { categories } from '../data/categories';
 import { questions } from '../data/questions';
-import { Category, Question } from '../types';
+
+interface DocLink {
+  name: string;
+  url: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+const docLinks: DocLink[] = [
+  {
+    name: 'IntelliJ IDEA',
+    url: 'https://www.jetbrains.com/idea/',
+    description: 'Java IDE 首选',
+    icon: '💻',
+    color: 'from-purple-500 to-indigo-500'
+  },
+  {
+    name: 'Spring Boot',
+    url: 'https://spring.io/projects/spring-boot',
+    description: 'Spring Framework',
+    icon: '🌱',
+    color: 'from-green-500 to-emerald-500'
+  },
+  {
+    name: 'Redis',
+    url: 'https://redis.io/',
+    description: 'NoSQL数据库',
+    icon: '🔴',
+    color: 'from-red-500 to-orange-500'
+  },
+  {
+    name: 'MySQL',
+    url: 'https://www.mysql.com/',
+    description: '关系型数据库',
+    icon: '🐬',
+    color: 'from-blue-500 to-cyan-500'
+  },
+  {
+    name: 'Maven',
+    url: 'https://maven.apache.org/',
+    description: '依赖管理工具',
+    icon: '🧱',
+    color: 'from-yellow-500 to-amber-500'
+  },
+  {
+    name: 'Git',
+    url: 'https://git-scm.com/',
+    description: '版本控制系统',
+    icon: '🔀',
+    color: 'from-orange-500 to-red-500'
+  },
+  {
+    name: 'Docker',
+    url: 'https://www.docker.com/',
+    description: '容器化平台',
+    icon: '🐳',
+    color: 'from-blue-600 to-blue-400'
+  },
+  {
+    name: 'Vue.js',
+    url: 'https://vuejs.org/',
+    description: '渐进式框架',
+    icon: '💚',
+    color: 'from-green-400 to-emerald-400'
+  },
+  {
+    name: 'Node.js',
+    url: 'https://nodejs.org/',
+    description: 'JavaScript运行时',
+    icon: '🟢',
+    color: 'from-green-600 to-green-400'
+  },
+  {
+    name: 'Postman',
+    url: 'https://www.postman.com/',
+    description: 'API测试工具',
+    icon: '🚀',
+    color: 'from-orange-400 to-yellow-400'
+  }
+];
 
 const Home = () => {
   const featuredQuestions = questions.slice(0, 6);
@@ -57,10 +137,37 @@ const Home = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Official Documentation Links */}
+        <section id="docs" className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+            🔧 开发工具箱
+          </h2>
+          <p className="text-gray-600 text-center mb-8">
+            Java开发者常用的官方文档和工具网站
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {docLinks.map((doc) => (
+              <a
+                key={doc.name}
+                href={doc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 border border-gray-100 group block"
+              >
+                <div className={`w-12 h-12 bg-gradient-to-br ${doc.color} rounded-lg flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform duration-200`}>
+                  {doc.icon}
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-1 text-sm">{doc.name}</h3>
+                <p className="text-gray-500 text-xs">{doc.description}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+
         {/* Categories Section */}
         <section id="categories" className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            知识分类
+            📚 知识分类
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
@@ -82,7 +189,7 @@ const Home = () => {
         {/* Featured Questions */}
         <section>
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            精选题目
+            🎯 精选题目
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {featuredQuestions.map((question) => (
