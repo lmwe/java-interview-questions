@@ -7,6 +7,7 @@ interface DocLink {
   name: string;
   url: string;
   description: string;
+  usage: string;
   icon: string;
   color: string;
 }
@@ -15,72 +16,98 @@ const docLinks: DocLink[] = [
   {
     name: 'IntelliJ IDEA',
     url: 'https://www.jetbrains.com/idea/',
-    description: 'Java IDE 首选',
+    description: 'Java集成开发环境（IDE），业界公认的Java开发首选工具',
+    usage: '安装后安装Tomcat、Spring等插件，配置Maven/Gradle项目，快速开发Java应用。支持代码提示、重构、调试等功能。',
     icon: '💻',
     color: 'from-purple-500 to-indigo-500'
   },
   {
     name: 'Spring Boot',
     url: 'https://spring.io/projects/spring-boot',
-    description: 'Spring Framework',
+    description: 'Spring Framework的子项目，简化Spring应用开发',
+    usage: '创建Spring Boot项目：访问start.spring.io生成项目结构。使用@SpringBootApplication启动应用，自动配置数据库、Web等。',
     icon: '🌱',
     color: 'from-green-500 to-emerald-500'
   },
   {
     name: 'Redis',
     url: 'https://redis.io/',
-    description: 'NoSQL数据库',
+    description: '高性能键值对数据库，常用于缓存和会话存储',
+    usage: '安装Redis后，使用redis-cli连接。常用命令：SET/GET存取数据，EXPIRE设置过期，HASH存对象。Java中使用Jedis或Lettuce客户端。',
     icon: '🔴',
     color: 'from-red-500 to-orange-500'
   },
   {
     name: 'MySQL',
     url: 'https://www.mysql.com/',
-    description: '关系型数据库',
+    description: '开源关系型数据库，Web应用最常用的数据库之一',
+    usage: '安装MySQL后，使用mysql -u root -p登录。创建数据库：CREATE DATABASE name；创建表：CREATE TABLE；常用命令：SELECT/INSERT/UPDATE/DELETE。',
     icon: '🐬',
     color: 'from-blue-500 to-cyan-500'
   },
   {
     name: 'Maven',
     url: 'https://maven.apache.org/',
-    description: '依赖管理工具',
+    description: 'Java项目管理和依赖管理工具，统一项目结构',
+    usage: '配置pom.xml添加依赖：<dependency>标签。常用命令：mvn clean install编译项目，mvn package打包，mvn spring-boot:run运行Spring Boot项目。',
     icon: '🧱',
     color: 'from-yellow-500 to-amber-500'
   },
   {
     name: 'Git',
     url: 'https://git-scm.com/',
-    description: '版本控制系统',
+    description: '分布式版本控制系统，管理代码版本和协作开发',
+    usage: 'git init初始化仓库。git add添加文件，git commit -m提交。git push推送到远程，git pull拉取更新。git branch创建分支，git merge合并分支。',
     icon: '🔀',
     color: 'from-orange-500 to-red-500'
   },
   {
     name: 'Docker',
     url: 'https://www.docker.com/',
-    description: '容器化平台',
+    description: '容器化平台，实现应用及其依赖的打包和部署',
+    usage: 'Dockerfile定义镜像：FROM指定基础镜像，COPY复制文件，RUN执行命令，CMD启动命令。构建镜像：docker build -t name。运行容器：docker run -p 8080:80 name。',
     icon: '🐳',
     color: 'from-blue-600 to-blue-400'
   },
   {
     name: 'Vue.js',
     url: 'https://vuejs.org/',
-    description: '渐进式框架',
+    description: '渐进式JavaScript框架，用于构建用户界面',
+    usage: '使用npm create vue@latest创建项目。组件结构：template写HTML，script写逻辑，style写样式。常用指令：v-if/v-for/v-model。状态管理用Pinia或Vuex。',
     icon: '💚',
     color: 'from-green-400 to-emerald-400'
   },
   {
     name: 'Node.js',
     url: 'https://nodejs.org/',
-    description: 'JavaScript运行时',
+    description: '基于Chrome V8引擎的JavaScript运行时，可开发后端服务',
+    usage: 'npm init初始化项目，npm install安装依赖。创建服务器：const http = require("http")。Express框架：npm install express，快速搭建Web API。',
     icon: '🟢',
     color: 'from-green-600 to-green-400'
   },
   {
     name: 'Postman',
     url: 'https://www.postman.com/',
-    description: 'API测试工具',
+    description: 'API开发和测试工具，简化HTTP请求调试',
+    usage: '新建请求：选择GET/POST等方法，输入URL。Params设置参数，Body选择raw/JSON格式发送数据。Headers设置请求头。Collections管理多个请求。',
     icon: '🚀',
     color: 'from-orange-400 to-yellow-400'
+  },
+  {
+    name: '微信小程序',
+    url: 'https://developers.weixin.qq.com/miniprogram/dev/framework/',
+    description: '微信官方小程序开发框架，跨平台移动应用',
+    usage: '下载微信开发者工具，创建项目。pages目录下创建页面，app.json配置路由，app.wxss写样式。调用wx.request发起网络请求，wx.setStorage存本地数据。',
+    icon: '💬',
+    color: 'from-green-500 to-green-400'
+  },
+  {
+    name: '微信小游戏',
+    url: 'https://developers.weixin.qq.com/minigame/dev/guide/',
+    description: '微信小游戏开发平台，基于Canvas/WebGL渲染',
+    usage: '使用微信开发者工具创建小游戏项目。LayaAir/Cocos Creator等引擎开发。小游戏使用wx.createCanvas()创建画布，通过requestAnimationFrame实现游戏循环。',
+    icon: '🎮',
+    color: 'from-blue-400 to-cyan-400'
   }
 ];
 
@@ -126,10 +153,10 @@ const Home = () => {
             </p>
             <div className="flex justify-center space-x-4">
               <a 
-                href="#categories" 
+                href="#docs" 
                 className="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg"
               >
-                开始学习
+                查看工具箱
               </a>
             </div>
           </div>
@@ -143,23 +170,44 @@ const Home = () => {
             🔧 开发工具箱
           </h2>
           <p className="text-gray-600 text-center mb-8">
-            Java开发者常用的官方文档和工具网站
+            Java开发者必备的官方文档和工具，包含详细使用教程
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {docLinks.map((doc) => (
-              <a
+              <div
                 key={doc.name}
-                href={doc.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 border border-gray-100 group block"
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 group"
               >
-                <div className={`w-12 h-12 bg-gradient-to-br ${doc.color} rounded-lg flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform duration-200`}>
-                  {doc.icon}
+                <div className="flex items-start space-x-4 mb-4">
+                  <div className={`w-14 h-14 bg-gradient-to-br ${doc.color} rounded-lg flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
+                    {doc.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-900 mb-1 text-lg">{doc.name}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{doc.description}</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1 text-sm">{doc.name}</h3>
-                <p className="text-gray-500 text-xs">{doc.description}</p>
-              </a>
+                
+                <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                  <h4 className="text-blue-900 font-semibold text-sm mb-2 flex items-center">
+                    <span className="mr-1">📖</span> 使用方法
+                  </h4>
+                  <p className="text-blue-800 text-xs leading-relaxed">{doc.usage}</p>
+                </div>
+                
+                <a
+                  href={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm"
+                >
+                  <span className="mr-2">🌐</span>
+                  访问官方文档
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
             ))}
           </div>
         </section>
