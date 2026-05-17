@@ -40,6 +40,48 @@ const Navbar = ({ isOpen, onToggle, onClose }: NavbarProps) => {
               >
                 首页
               </Link>
+              <a 
+                href="#ai-tools"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById('ai-tools');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium flex items-center"
+              >
+                <span className="mr-1">🤖</span>
+                AI工具
+              </a>
+              <a 
+                href="#docs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById('docs');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium flex items-center"
+              >
+                <span className="mr-1">🔧</span>
+                工具箱
+              </a>
+              <a 
+                href="#categories"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById('categories');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium flex items-center"
+              >
+                <span className="mr-1">📚</span>
+                知识分类
+              </a>
             </div>
           </div>
         </div>
