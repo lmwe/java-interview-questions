@@ -20,56 +20,115 @@ const navItems: NavItem[] = [
   { id: 'advanced', name: '高级特性', icon: '🚀', type: 'question' },
 ];
 
-const Sidebar = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      onClose();
     }
   };
 
   return (
-    <aside className="fixed left-0 top-16 h-screen w-64 bg-white shadow-lg overflow-y-auto border-r border-gray-200 z-40">
-      <div className="p-4">
-        <div className="mb-6">
-          <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 flex items-center">
-            <span className="mr-2">🔧</span> 开发工具
-          </h3>
-          <ul className="space-y-1">
-            {navItems.filter(item => item.type === 'tool').map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => scrollToSection(item.id)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-3 text-sm font-medium"
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  <span>{item.name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:block fixed left-0 top-16 h-screen w-64 bg-white shadow-lg overflow-y-auto border-r border-gray-200 z-40">
+        <div className="p-4">
+          <div className="mb-6">
+            <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 flex items-center">
+              <span className="mr-2">🔧</span> 开发工具
+            </h3>
+            <ul className="space-y-1">
+              {navItems.filter(item => item.type === 'tool').map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => scrollToSection(item.id)}
+                    className="w-full text-left px-4 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-3 text-sm font-medium"
+                  >
+                    <span className="text-lg">{item.icon}</span>
+                    <span>{item.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div className="mb-6">
-          <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 flex items-center">
-            <span className="mr-2">📝</span> 面试题分类
-          </h3>
-          <ul className="space-y-1">
-            {navItems.filter(item => item.type === 'question').map((item) => (
-              <li key={item.id}>
-                <Link
-                  to={`/category/${item.id}`}
-                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-3 text-sm font-medium"
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  <span>{item.name}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="mb-6">
+            <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 flex items-center">
+              <span className="mr-2">📝</span> 面试题分类
+            </h3>
+            <ul className="space-y-1">
+              {navItems.filter(item => item.type === 'question').map((item) => (
+                <li key={item.id}>
+                  <Link
+                    to={`/category/${item.id}`}
+                    className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-3 text-sm font-medium"
+                  >
+                    <span className="text-lg">{item.icon}</span>
+                    <span>{item.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-lg">
+        <div className="flex justify-around items-center py-2">
+          <Link
+            to="/"
+            className="flex flex-col items-center text-blue-600 p-2"
+          >
+            <span className="text-2xl mb-1">🏠</span>
+            <span className="text-xs">首页</span>
+          </Link>
+          <Link
+            to="/category/basics"
+            className="flex flex-col items-center text-gray-600 p-2"
+          >
+            <span className="text-2xl mb-1">📚</span>
+            <span className="text-xs">面试题</span>
+          </Link>
+          <a
+            href="#ai-tools"
+            className="flex flex-col items-center text-gray-600 p-2"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('ai-tools');
+            }}
+          >
+            <span className="text-2xl mb-1">🤖</span>
+            <span className="text-xs">AI工具</span>
+          </a>
+          <a
+            href="#docs"
+            className="flex flex-col items-center text-gray-600 p-2"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('docs');
+            }}
+          >
+            <span className="text-2xl mb-1">🔧</span>
+            <span className="text-xs">工具箱</span>
+          </a>
+        </div>
+      </nav>
+    </>
   );
 };
 
