@@ -733,5 +733,320 @@ bootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
     });
 bootstrap.bind(8080).sync();`,
     tags: ['Netty', '网络编程']
+  },
+  {
+    id: '31',
+    title: '什么是MyBatis？#{}和${}的区别是什么？',
+    content: '解释MyBatis的概念、特点，以及#{}和${}的区别、使用场景。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'MyBatis是持久层框架，避免JDBC代码。#{}是预编译处理，使用PreparedStatement，能防止SQL注入。${}是字符串替换，直接替换，有SQL注入风险。#{id} → ?，${table} → 直接替换。',
+    codeExample: "<!-- #{}预编译，安全 -->\n<select id=\"getUser\" resultType=\"User\">\n    SELECT * FROM user WHERE id = #{id}\n</select>\n\n<!-- ${}字符串替换，需注意SQL注入 -->\n<select id=\"getUsers\" resultType=\"User\">\n    SELECT * FROM ${tableName}\n</select>\n\n<!-- 模糊查询 - 正确做法 -->\n<select id=\"searchUser\" resultType=\"User\">\n    SELECT * FROM user WHERE name LIKE CONCAT('%', #{keyword}, '%')\n</select>",
+    tags: ['MyBatis', 'ORM']
+  },
+  {
+    id: '32',
+    title: '什么是RESTful API？设计原则是什么？',
+    content: '解释RESTful API的概念、设计原则（资源、HTTP方法、状态码、URI设计等）。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'RESTful是基于REST架构风格的API设计。核心原则：1)资源用URI表示；2)用HTTP动词操作（GET查、POST增、PUT改、DELETE删）；3)无状态；4)用HTTP状态码；5)HATEOAS。',
+    codeExample: `// RESTful API示例
+GET    /users              # 获取用户列表
+GET    /users/1            # 获取id为1的用户
+POST   /users              # 创建新用户
+PUT    /users/1            # 更新用户
+DELETE /users/1            # 删除用户
+GET    /users/1/orders     # 获取用户的订单列表
+POST   /users/1/orders     # 为用户创建订单
+
+// HTTP状态码
+200 OK                    // 成功
+201 Created               // 创建成功
+400 Bad Request           // 请求参数错误
+401 Unauthorized          // 未授权
+404 Not Found             // 资源不存在
+500 Internal Server Error // 服务器错误`,
+    tags: ['RESTful', 'API设计']
+  },
+  {
+    id: '33',
+    title: '什么是Redis持久化？RDB和AOF的区别？',
+    content: '解释Redis持久化的概念、RDB和AOF两种方式的原理、优缺点对比。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: 'Redis持久化将内存数据保存到磁盘。RDB是快照式，save/bgsave生成.rdb文件。AOF记录每次写命令，追加到.aof文件，支持重写。RDB快、文件小但可能丢数据。AOF更可靠、文件大。混合模式是推荐方案。',
+    codeExample: `# RDB配置
+save 900 1          # 900秒内1个修改
+save 300 10         # 300秒内10个修改
+rdbfilename dump.rdb
+
+# AOF配置
+appendonly yes
+appendfsync everysec  # 每秒同步
+no-appendfsync-on-rewrite yes
+
+# 混合持久化（Redis 4.0+）
+aof-use-rdb-preamble yes
+
+# 命令
+SAVE       # 同步保存
+BGSAVE     # 后台保存
+BGREWRITEAOF # AOF重写`,
+    tags: ['Redis', '持久化']
+  },
+  {
+    id: '34',
+    title: '什么是缓存雪崩、缓存穿透、缓存击穿？如何解决？',
+    content: '解释这三个缓存问题的概念、原因及解决方案。',
+    category: 'advanced',
+    difficulty: 'hard',
+    answer: '缓存雪崩：大量key同时过期。解决：过期时间加随机值。缓存穿透：查不存在的数据。解决：布隆过滤器。缓存击穿：热点key过期。解决：互斥锁、永不过期。',
+    codeExample: `// 互斥锁解决缓存击穿
+public User getUser(Long id) {
+    String key = "user:" + id;
+    User user = redis.get(key);
+    if (user != null) {
+        return user;
+    }
+    String lockKey = "lock:user:" + id;
+    if (redis.set(lockKey, "1", "NX", "EX", 10)) {
+        try {
+            user = db.getUser(id);
+            if (user != null) {
+                redis.set(key, user, 3600);
+            }
+            return user;
+        } finally {
+            redis.del(lockKey);
+        }
+    } else {
+        Thread.sleep(100);
+        return getUser(id);
+    }
+}
+
+// 布隆过滤器
+BloomFilter<Long> filter = BloomFilter.create(Funnels.longFunnel(), 1000000, 0.01);
+filter.put(userId);
+if (filter.mightContain(userId)) {
+    // 查询缓存或数据库
+}`,
+    tags: ['缓存', 'Redis']
+  },
+  {
+    id: '35',
+    title: '什么是JVM类加载机制？双亲委派模型？',
+    content: '解释JVM类加载过程、类加载器、双亲委派模型的原理和优势。',
+    category: 'jvm',
+    difficulty: 'hard',
+    answer: '类加载过程：加载、验证、准备、解析、初始化。类加载器：Bootstrap、Extension、Application、Custom。双亲委派：先父后子加载。优势：避免重复加载、保证核心类安全。',
+    codeExample: `// 类加载器层次
+Bootstrap ClassLoader   // 加载JDK核心类
+     ↑
+Extension ClassLoader  // 加载扩展类
+     ↑
+Application ClassLoader // 加载应用类
+     ↑
+Custom ClassLoader
+
+// 打破双亲委派（Tomcat等）
+public class MyClassLoader extends ClassLoader {
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        // 自定义加载逻辑
+    }
+}
+
+// 查看类加载器
+ClassLoader loader = MyClass.class.getClassLoader();
+System.out.println(loader);`,
+    tags: ['JVM', '类加载']
+  },
+  {
+    id: '36',
+    title: '什么是Sentinel？有什么功能？',
+    content: '介绍Sentinel的概念、主要功能（限流、熔断、降级）和使用场景。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'Sentinel是阿里的流量控制组件。功能：1)流量控制（QPS限流、并发线程数控制）；2)熔断降级（慢调用、异常比例、异常数）；3)系统保护。比Hystrix更强大。',
+    codeExample: `// 定义资源
+try (Entry entry = SphU.entry("resourceName")) {
+    // 业务逻辑
+} catch (BlockException ex) {
+    // 被限流/熔断
+}
+
+// 注解方式
+@SentinelResource(value = "hello", blockHandler = "handleBlock")
+public String hello() {
+    return "Hello";
+}
+
+public String handleBlock(BlockException ex) {
+    return "被限流了";
+}
+
+// 配置规则
+FlowRule rule = new FlowRule();
+rule.setResource("resource");
+rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+rule.setCount(10); // 每秒10次
+FlowRuleManager.loadRules(Collections.singletonList(rule));`,
+    tags: ['Sentinel', '限流熔断']
+  },
+  {
+    id: '37',
+    title: '什么是设计模式？单例模式有几种写法？',
+    content: '介绍设计模式概念，单例模式的多种实现方式（饿汉、懒汉、双重检查、枚举、静态内部类）。',
+    category: 'oop',
+    difficulty: 'medium',
+    answer: '设计模式是问题解决方案的总结。单例模式：1)饿汉式（类加载初始化）；2)懒汉式（需要时创建，线程不安全）；3)双重检查（volatile + synchronized）；4)静态内部类（推荐）；5)枚举（最佳）。',
+    codeExample: `// 1. 饿汉式
+public class Singleton1 {
+    private static final Singleton1 INSTANCE = new Singleton1();
+    private Singleton1() {}
+    public static Singleton1 getInstance() { return INSTANCE; }
+}
+
+// 2. 双重检查
+public class Singleton2 {
+    private static volatile Singleton2 INSTANCE;
+    private Singleton2() {}
+    public static Singleton2 getInstance() {
+        if (INSTANCE == null) {
+            synchronized (Singleton2.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new Singleton2();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+}
+
+// 3. 静态内部类（推荐）
+public class Singleton3 {
+    private Singleton3() {}
+    private static class Holder {
+        private static final Singleton3 INSTANCE = new Singleton3();
+    }
+    public static Singleton3 getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+
+// 4. 枚举（最佳）
+public enum Singleton4 {
+    INSTANCE;
+}`,
+    tags: ['设计模式', '单例']
+  },
+  {
+    id: '38',
+    title: '什么是Nacos？服务注册与配置中心？',
+    content: '介绍Nacos的功能、特点，以及如何实现服务注册发现和配置中心。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'Nacos是阿里开源的注册中心和配置中心。功能：1)服务发现（替代Eureka）；2)配置中心（替代Config）；3)DNS服务。支持AP和CP模式。',
+    codeExample: `// 服务注册
+@SpringBootApplication
+@EnableDiscoveryClient
+public class App { }
+
+// 配置文件
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+
+// 动态配置
+@RefreshScope
+@RestController
+public class ConfigController {
+    @Value("${app.name}")
+    private String appName;
+}
+
+// Nacos API
+NamingService naming = NamingFactory.createNamingService("localhost:8848");
+naming.registerInstance("serviceName", "127.0.0.1", 8080);
+Instance instance = naming.selectOneHealthyInstance("serviceName");`,
+    tags: ['Nacos', '微服务']
+  },
+  {
+    id: '39',
+    title: '什么是MQ？RabbitMQ的架构？',
+    content: '介绍消息队列的概念、作用，RabbitMQ的核心组件和工作流程。',
+    category: 'advanced',
+    difficulty: 'medium',
+    answer: 'MQ是消息中间件，解耦、异步、削峰。RabbitMQ架构：Producer → Exchange（交换机）→ Queue（队列）→ Consumer。交换机类型：direct、topic、fanout、headers。',
+    codeExample: `// 简单生产者
+ConnectionFactory factory = new ConnectionFactory();
+factory.setHost("localhost");
+Connection connection = factory.newConnection();
+Channel channel = connection.createChannel();
+channel.queueDeclare("queue", false, false, false, null);
+channel.basicPublish("", "queue", null, "Hello".getBytes());
+
+// 简单消费者
+channel.basicConsume("queue", true, (tag, delivery) -> {
+    String msg = new String(delivery.getBody());
+    System.out.println("收到: " + msg);
+}, tag -> {});
+
+// Spring Boot
+@RabbitListener(queues = "queue")
+public void listen(String msg) {
+    System.out.println("收到: " + msg);
+}
+
+@RabbitListener(bindings = @QueueBinding(
+    value = @Queue("queue"),
+    exchange = @Exchange(value = "exchange", type = "topic"),
+    key = "routing.key"
+))`,
+    tags: ['RabbitMQ', '消息队列']
+  },
+  {
+    id: '40',
+    title: '什么是GitFlow工作流？常用Git命令？',
+    content: '介绍GitFlow分支管理策略，以及常用Git命令。',
+    category: 'basics',
+    difficulty: 'easy',
+    answer: 'GitFlow是分支管理模型：master（生产）、develop（开发）、feature（功能）、release（发布）、hotfix（热修复）。常用命令：clone、pull、push、add、commit、merge、rebase、stash。',
+    codeExample: `# GitFlow流程
+git checkout -b feature/new-feature develop  # 新建功能分支
+# 开发完成
+git checkout develop
+git merge --no-ff feature/new-feature
+# 准备发布
+git checkout -b release/1.0 develop
+# 修复bug后合并到master和develop
+git checkout master
+git merge --no-ff release/1.0
+git tag -a 1.0
+git checkout develop
+git merge --no-ff release/1.0
+# 热修复
+git checkout -b hotfix/bug master
+# 修复后合并到master和develop
+
+# 常用命令
+git clone repo
+git pull origin main
+git add .
+git commit -m "message"
+git push origin main
+git branch new-branch
+git checkout new-branch
+git merge other-branch
+git rebase main
+git stash`,
+    tags: ['Git', '版本控制']
   }
 ];
