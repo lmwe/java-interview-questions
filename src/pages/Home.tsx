@@ -12,6 +12,178 @@ interface DocLink {
   color: string;
 }
 
+interface AiLink {
+  name: string;
+  url: string;
+  description: string;
+  icon: string;
+  color: string;
+  category: string;
+}
+
+const aiTools: AiLink[] = [
+  {
+    name: 'ChatGPT',
+    url: 'https://chat.openai.com',
+    description: 'OpenAI的智能对话AI助手，支持代码生成、写作、翻译等',
+    icon: '🤖',
+    color: 'from-green-500 to-green-600',
+    category: '大模型'
+  },
+  {
+    name: 'Claude',
+    url: 'https://claude.ai',
+    description: 'Anthropic公司开发的AI助手，擅长长文本处理和代码生成',
+    icon: '🧠',
+    color: 'from-orange-500 to-amber-500',
+    category: '大模型'
+  },
+  {
+    name: 'Gemini',
+    url: 'https://gemini.google.com',
+    description: 'Google开发的AI助手，支持多模态交互和代码生成',
+    icon: '✨',
+    color: 'from-blue-500 to-indigo-500',
+    category: '大模型'
+  },
+  {
+    name: '通义千问',
+    url: 'https://tongyi.aliyun.com',
+    description: '阿里云开发的AI助手，支持对话、代码、写作等功能',
+    icon: '🦅',
+    color: 'from-orange-500 to-orange-600',
+    category: '大模型'
+  },
+  {
+    name: '文心一言',
+    url: 'https://yiyan.baidu.com',
+    description: '百度开发的AI助手，支持对话、写作、代码生成',
+    icon: '🐼',
+    color: 'from-red-500 to-orange-500',
+    category: '大模型'
+  },
+  {
+    name: '智谱AI',
+    url: 'https://chatglm.cn',
+    description: '清华系开发的AI助手，支持多模态和编程',
+    icon: '🔬',
+    color: 'from-purple-500 to-indigo-500',
+    category: '大模型'
+  },
+  {
+    name: '豆包',
+    url: 'https://www.doubao.com',
+    description: '字节跳动开发的AI助手，支持对话、写作、代码',
+    icon: '📦',
+    color: 'from-emerald-500 to-teal-500',
+    category: '大模型'
+  },
+  {
+    name: 'GitHub Copilot',
+    url: 'https://copilot.github.com',
+    description: 'AI编程助手，自动补全代码，支持多种编程语言',
+    icon: '🚀',
+    color: 'from-gray-700 to-gray-900',
+    category: '编程工具'
+  },
+  {
+    name: 'Cursor',
+    url: 'https://cursor.so',
+    description: 'AI代码编辑器，基于GPT-4，支持代码补全、修复、重构',
+    icon: '✏️',
+    color: 'from-blue-600 to-cyan-600',
+    category: '编程工具'
+  },
+  {
+    name: 'Codeium',
+    url: 'https://codeium.com',
+    description: '免费的AI编程助手，支持多种IDE和编程语言',
+    icon: '💡',
+    color: 'from-yellow-500 to-orange-500',
+    category: '编程工具'
+  },
+  {
+    name: 'Midjourney',
+    url: 'https://www.midjourney.com',
+    description: 'AI绘画工具，通过文字描述生成高质量图片',
+    icon: '🎨',
+    color: 'from-purple-600 to-pink-600',
+    category: '图像生成'
+  },
+  {
+    name: 'Stable Diffusion',
+    url: 'https://stability.ai',
+    description: '开源的AI绘画模型，支持本地部署和定制',
+    icon: '🖼️',
+    color: 'from-indigo-500 to-purple-500',
+    category: '图像生成'
+  },
+  {
+    name: 'DALL-E',
+    url: 'https://openai.com/dall-e-3',
+    description: 'OpenAI开发的AI绘画工具，生成高质量图片',
+    icon: '🖌️',
+    color: 'from-emerald-500 to-green-600',
+    category: '图像生成'
+  },
+  {
+    name: 'Runway',
+    url: 'https://runwayml.com',
+    description: 'AI视频生成和编辑平台，支持多种创意工具',
+    icon: '🎬',
+    color: 'from-pink-500 to-rose-600',
+    category: '视频生成'
+  },
+  {
+    name: 'Suno',
+    url: 'https://suno.ai',
+    description: 'AI音乐生成平台，通过文字描述生成音乐',
+    icon: '🎵',
+    color: 'from-cyan-500 to-blue-600',
+    category: '音频生成'
+  },
+  {
+    name: 'Notion AI',
+    url: 'https://www.notion.so/product/ai',
+    description: 'Notion内置的AI助手，支持写作、总结、翻译等',
+    icon: '📝',
+    color: 'from-gray-800 to-black',
+    category: '写作工具'
+  },
+  {
+    name: 'DeepL',
+    url: 'https://www.deepl.com',
+    description: '高质量的AI翻译工具，支持多种语言',
+    icon: '🌍',
+    color: 'from-red-600 to-red-700',
+    category: '翻译工具'
+  },
+  {
+    name: 'Perplexity',
+    url: 'https://www.perplexity.ai',
+    description: 'AI搜索引擎，提供带引用来源的回答',
+    icon: '🔍',
+    color: 'from-yellow-400 to-yellow-600',
+    category: '搜索工具'
+  },
+  {
+    name: 'Hugging Face',
+    url: 'https://huggingface.co',
+    description: 'AI模型库和开源社区，提供各种AI模型和工具',
+    icon: '🤗',
+    color: 'from-yellow-500 to-amber-600',
+    category: '开发平台'
+  },
+  {
+    name: 'Ollama',
+    url: 'https://ollama.com',
+    description: '本地运行大模型的工具，支持多种开源模型',
+    icon: '🦙',
+    color: 'from-emerald-600 to-green-700',
+    category: '开发平台'
+  }
+];
+
 const backendTools: DocLink[] = [
   {
     name: 'IntelliJ IDEA',
@@ -175,6 +347,26 @@ const ToolSection = ({ id, title, tools }: ToolSectionProps) => {
   );
 };
 
+const AiToolCard = ({ tool }: { tool: AiLink }) => (
+  <a
+    href={tool.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-5 border border-gray-100 group flex items-start space-x-4 hover:scale-[1.02]"
+  >
+    <div className={`w-12 h-12 bg-gradient-to-br ${tool.color} rounded-lg flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
+      {tool.icon}
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center justify-between">
+        <h4 className="font-bold text-gray-900 text-base">{tool.name}</h4>
+        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">{tool.category}</span>
+      </div>
+      <p className="text-gray-600 text-sm mt-1 line-clamp-2">{tool.description}</p>
+    </div>
+  </a>
+);
+
 const Home = () => {
   const featuredQuestions = questions.slice(0, 6);
   
@@ -207,6 +399,23 @@ const Home = () => {
       
       {/* Main Content with Sidebar Offset */}
       <div className="ml-64">
+        {/* AI Tools Navigation */}
+        <section id="ai-tools" className="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-3 flex items-center justify-center">
+                <span className="mr-3">🤖</span> AI工具导航
+              </h2>
+              <p className="text-indigo-200 text-lg">精心整理的热门AI工具，助力开发者提升效率</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {aiTools.map((tool) => (
+                <AiToolCard key={tool.name} tool={tool} />
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Hero Section */}
         <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
