@@ -371,6 +371,13 @@ const AiToolCard = ({ tool }: { tool: AiLink }) => (
 const Home = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const featuredQuestions = questions.slice(0, 10);
+
+  const scrollToQuestions = () => {
+    const element = document.getElementById('questions');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   const getCategoryName = (categoryId: string) => {
     const cat = categories.find(c => c.id === categoryId);
@@ -416,12 +423,12 @@ const Home = () => {
                 精心整理的Java面试题集，涵盖基础、集合、并发、JVM等核心知识，助您面试一臂之力！
               </p>
               <div className="flex justify-center space-x-4">
-                <a 
-                  href="#questions" 
+                <button 
+                  onClick={scrollToQuestions}
                   className="bg-white text-blue-900 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg text-sm sm:text-base"
                 >
                   开始刷题
-                </a>
+                </button>
               </div>
             </div>
           </div>
