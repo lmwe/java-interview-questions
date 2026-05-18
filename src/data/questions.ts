@@ -132,6 +132,194 @@ linkedList.add(0, "a");  // O(1) 只修改指针`,
     tags: ['集合', 'List']
   },
   {
+    id: '7-1',
+    title: 'HashMap和Hashtable的区别',
+    content: '对比HashMap和Hashtable在线程安全、性能、null支持等方面的区别。',
+    category: 'collection',
+    difficulty: 'medium',
+    answer: 'HashMap线程不安全，允许key和value为null，效率高。Hashtable线程安全（synchronized修饰），不允许key或value为null，效率低。推荐使用ConcurrentHashMap替代Hashtable。',
+    codeExample: `// HashMap允许null
+HashMap<String, Integer> map = new HashMap<>();
+map.put(null, 1);      // 允许
+map.put("key", null);  // 允许
+
+// Hashtable不允许null
+Hashtable<String, Integer> table = new Hashtable<>();
+table.put(null, 1);    // NullPointerException
+table.put("key", null); // NullPointerException
+
+// 线程安全推荐使用ConcurrentHashMap
+ConcurrentHashMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();
+concurrentMap.put("key", 1); // 高效的线程安全操作`,
+    tags: ['集合', 'Map']
+  },
+  {
+    id: '7-2',
+    title: 'ConcurrentHashMap的实现原理',
+    content: '详细解释ConcurrentHashMap如何实现高效的并发访问，包括JDK 7的分段锁和JDK 8的CAS+synchronized。',
+    category: 'collection',
+    difficulty: 'hard',
+    answer: 'JDK 7使用Segment数组+链表，每个Segment类似一个Hashtable。JDK 8取消分段锁，采用数组+链表+红黑树，使用CAS操作和synchronized来保证并发安全。put时如果数组为空，用CAS初始化头节点；否则对头节点加锁插入。',
+    codeExample: `// ConcurrentHashMap基本操作
+ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+
+// 原子操作
+map.putIfAbsent("key", 1);  // 不存在才插入
+map.computeIfAbsent("key", k -> 1);  // compute
+map.merge("key", 1, Integer::sum);  // 合并
+
+// 高并发场景
+for (int i = 0; i < 100; i++) {
+    new Thread(() -> {
+        map.put(Thread.currentThread().getName(), 1);
+    }).start();
+}
+
+// JDK 8后采用CAS+synchronized
+// 1. 使用CAS初始化数组
+// 2. 使用synchronized锁住头节点进行插入
+// 3. 链表转红黑树阈值仍为8`,
+    tags: ['集合', '并发', '线程安全']
+  },
+  {
+    id: '7-3',
+    title: 'HashSet的实现原理',
+    content: '解释HashSet如何保证元素唯一性，以及它与HashMap的关系。',
+    category: 'collection',
+    difficulty: 'medium',
+    answer: 'HashSet底层使用HashMap实现，元素作为Map的key，value使用一个Object对象（PRESENT）。添加元素时调用hashCode和equals判断唯一性。由于HashMap的key不能重复，所以HashSet元素唯一。',
+    codeExample: `// HashSet内部实际使用HashMap
+private transient HashMap<E, Object> map;
+private static final Object PRESENT = new Object();
+
+public boolean add(E e) {
+    return map.put(e, PRESENT) == null;
+}
+
+// HashSet保证唯一性的过程
+// 1. 计算hashCode确定bucket位置
+// 2. 通过equals比较是否已存在
+// 3. 已存在返回false，不存在则添加返回true
+
+Set<String> set = new HashSet<>();
+set.add("hello");
+set.add("hello");  // 返回false，不会重复添加
+
+// LinkedHashSet保持插入顺序
+Set<String> linkedSet = new LinkedHashSet<>();
+linkedSet.add("a");
+linkedSet.add("b");
+linkedSet.add("a");  // 保持a,b的插入顺序`,
+    tags: ['集合', 'Set']
+  },
+  {
+    id: '7-4',
+    title: 'TreeMap和HashMap的区别',
+    content: '对比TreeMap和HashMap的底层数据结构、排序方式和使用场景。',
+    category: 'collection',
+    difficulty: 'medium',
+    answer: 'HashMap基于哈希表，无序；TreeMap基于红黑树，有序（自然顺序或自定义Comparator）。HashMap查找O(1)，TreeMap查找O(log n)。TreeMap支持范围查询和按序遍历。',
+    codeExample: `// HashMap - 无序
+Map<String, Integer> hashMap = new HashMap<>();
+hashMap.put("banana", 2);
+hashMap.put("apple", 1);
+hashMap.put("cherry", 3);
+// 遍历顺序不确定
+
+// TreeMap - 有序
+Map<String, Integer> treeMap = new TreeMap<>();
+treeMap.put("banana", 2);
+treeMap.put("apple", 1);
+treeMap.put("cherry", 3);
+// 遍历顺序: apple, banana, cherry（字典序）
+
+// 自定义排序
+TreeMap<Integer, String> customMap = new TreeMap<>(Comparator.reverseOrder());
+customMap.put(1, "one");
+customMap.put(3, "three");
+customMap.put(2, "two");
+// 遍历顺序: 3, 2, 1（降序）
+
+// TreeMap特有功能
+treeMap.firstKey();  // 获取最小key
+treeMap.lastKey();   // 获取最大key
+treeMap.subMap("a", "c");  // 获取子Map`,
+    tags: ['集合', 'Map', '红黑树']
+  },
+  {
+    id: '7-5',
+    title: 'ArrayList的扩容机制',
+    content: '详细解释ArrayList的扩容原理，包括默认容量、扩容公式和性能影响。',
+    category: 'collection',
+    difficulty: 'hard',
+    answer: 'ArrayList默认容量为10。添加第一个元素时数组初始化为空数组，扩容时创建新数组并复制元素。JDK 6及之前：newCapacity = (oldCapacity * 3) / 2 + 1；JDK 7开始使用 oldCapacity + (oldCapacity >> 1)，即1.5倍。扩容操作耗时，应预估容量或使用ArrayList(int initialCapacity)预分配。',
+    codeExample: `// ArrayList扩容源码（JDK 8）
+private void grow(int minCapacity) {
+    int oldCapacity = elementData.length;
+    // 新容量 = 旧容量 + 旧容量/2（即1.5倍）
+    int newCapacity = oldCapacity + (oldCapacity >> 1);
+    if (newCapacity - minCapacity < 0)
+        newCapacity = minCapacity;
+    if (newCapacity - MAX_ARRAY_SIZE > 0)
+        newCapacity = hugeCapacity(minCapacity);
+    // 复制数组
+    elementData = Arrays.copyOf(elementData, newCapacity);
+}
+
+// 性能影响
+List<Integer> list = new ArrayList<>();
+// 每次add都可能触发扩容和数组复制
+for (int i = 0; i < 100000; i++) {
+    list.add(i);  // 多次扩容，效率低
+}
+
+// 推荐做法：预估容量
+List<Integer> list2 = new ArrayList<>(100000);
+for (int i = 0; i < 100000; i++) {
+    list2.add(i);  // 一次分配，效率高
+}
+
+// trimToSize()回收多余空间
+list2.trimToSize();`,
+    tags: ['集合', 'ArrayList', '性能']
+  },
+  {
+    id: '7-6',
+    title: 'fail-fast与fail-safe的区别',
+    content: '解释Java集合框架中的fail-fast和fail-safe机制，以及它们在并发环境下的表现。',
+    category: 'collection',
+    difficulty: 'hard',
+    answer: 'fail-fast在检测到并发修改时立即抛出ConcurrentModificationException，通过modCount实现。ArrayList、HashMap等非线程安全集合采用fail-fast。fail-safe复制集合快照进行遍历，不抛异常，如CopyOnWriteArrayList、ConcurrentHashMap。',
+    codeExample: `// fail-fast示例
+List<String> list = new ArrayList<>();
+list.add("a");
+for (String item : list) {  // ConcurrentModificationException
+    list.remove(item);
+}
+
+// 正确遍历删除方式
+Iterator<String> iterator = list.iterator();
+while (iterator.hasNext()) {
+    if (iterator.next().equals("a")) {
+        iterator.remove();  // 使用迭代器删除
+    }
+}
+
+// fail-safe示例
+List<String> safeList = new CopyOnWriteArrayList<>();
+safeList.add("a");
+for (String item : safeList) {  // 不会抛异常
+    safeList.remove(item);       // 可以安全删除
+}
+
+// ConcurrentHashMap遍历
+ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+map.put("a", 1);
+// 安全遍历，不会抛ConcurrentModificationException
+map.forEach((k, v) -> System.out.println(k + ": " + v));`,
+    tags: ['集合', '并发', '异常处理']
+  },
+  {
     id: '8',
     title: '什么是Java的多态？',
     content: '解释多态的概念、实现方式（重载和重写）以及向上转型和向下转型。',
