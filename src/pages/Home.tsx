@@ -310,10 +310,10 @@ const ToolSection = ({ id, title, tools }: ToolSectionProps) => {
         {tools.map((doc) => (
           <div
             key={doc.name}
-            className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 border border-gray-100 group"
+            className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-4 sm:p-6 border border-gray-100 group card-hover"
           >
             <div className="flex items-start space-x-3 sm:space-x-4 mb-3 sm:mb-4">
-              <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${doc.color} rounded-lg flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${doc.color} rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
                 {doc.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -322,18 +322,18 @@ const ToolSection = ({ id, title, tools }: ToolSectionProps) => {
               </div>
             </div>
             
-            <div className="bg-blue-50 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
-              <h5 className="text-blue-900 font-semibold text-xs sm:text-sm mb-1 sm:mb-2 flex items-center">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
+              <h5 className="text-indigo-900 font-semibold text-xs sm:text-sm mb-1 sm:mb-2 flex items-center">
                 <span className="mr-1">📖</span> 使用方法
               </h5>
-              <p className="text-blue-800 text-xs leading-relaxed line-clamp-3">{doc.usage}</p>
+              <p className="text-indigo-800 text-xs leading-relaxed line-clamp-3">{doc.usage}</p>
             </div>
             
             <a
               href={doc.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-xs sm:text-sm"
+              className="inline-flex items-center justify-center w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 text-xs sm:text-sm shadow-lg hover:shadow-xl"
             >
               <span className="mr-1 sm:mr-2">🌐</span>
               访问官方文档
@@ -353,15 +353,15 @@ const AiToolCard = ({ tool }: { tool: AiLink }) => (
     href={tool.url}
     target="_blank"
     rel="noopener noreferrer"
-    className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-3 sm:p-5 border border-gray-100 group flex items-start space-x-3 hover:scale-[1.02]"
+    className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-3 sm:p-5 border border-white/20 group flex items-start space-x-3 hover:scale-[1.02] card-hover"
   >
-    <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${tool.color} rounded-lg flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
+    <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${tool.color} rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
       {tool.icon}
     </div>
     <div className="flex-1 min-w-0">
       <div className="flex items-center justify-between mb-1">
         <h4 className="font-bold text-gray-900 text-xs sm:text-base">{tool.name}</h4>
-        <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">{tool.category}</span>
+        <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-lg text-xs font-medium border border-indigo-200">{tool.category}</span>
       </div>
       <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2">{tool.description}</p>
     </div>
@@ -386,9 +386,9 @@ const Home = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'hard': return 'bg-red-100 text-red-800';
+      case 'easy': return 'difficulty-easy';
+      case 'medium': return 'difficulty-medium';
+      case 'hard': return 'difficulty-hard';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -403,7 +403,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
       <Navbar 
         isOpen={isMobileMenuOpen}
         onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -413,21 +413,25 @@ const Home = () => {
       {/* Main Content */}
       <div className="md:ml-64 pb-20 sm:pb-0">
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-            <div className="text-center">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 animate-fade-in">
+        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+            <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative z-10">
+            <div className="text-center animate-fadeInUp">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
                 Java面试题精选
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-blue-100 mb-6 sm:mb-8 max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-2xl text-indigo-100 mb-6 sm:mb-10 max-w-3xl mx-auto">
                 精心整理的Java面试题集，涵盖基础、集合、并发、JVM等核心知识，助您面试一臂之力！
               </p>
-              <div className="flex justify-center space-x-4">
+              <div className="flex justify-center">
                 <button 
                   onClick={scrollToQuestions}
-                  className="bg-white text-blue-900 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200 shadow-lg text-sm sm:text-base"
+                  className="bg-white text-indigo-600 px-8 sm:px-12 py-4 sm:py-5 rounded-2xl font-bold hover:bg-indigo-50 transition-all duration-300 shadow-2xl hover:shadow-3xl text-base sm:text-xl transform hover:scale-[1.05]"
                 >
-                  开始刷题
+                  🚀 开始刷题
                 </button>
               </div>
             </div>
@@ -437,21 +441,22 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
           {/* Featured Questions - First Priority */}
           <section id="questions" className="mb-12 sm:mb-20 scroll-mt-24">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
+            <h2 className="section-title mb-6 sm:mb-10 text-center">
               🎯 精选面试题
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {featuredQuestions.map((question) => (
+              {featuredQuestions.map((question, index) => (
                 <Link 
                   key={question.id}
                   to={`/question/${question.id}`}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 border border-gray-100 group"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-4 sm:p-6 border border-gray-100 group card-hover animate-fadeInUp"
+                  style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div className="flex items-start justify-between mb-2 sm:mb-3">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors flex-1 mr-2">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors flex-1 mr-2">
                       {question.title}
                     </h3>
-                    <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)} whitespace-nowrap`}>
+                    <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)} whitespace-nowrap border`}>
                       {getDifficultyText(question.difficulty)}
                     </span>
                   </div>
@@ -459,12 +464,12 @@ const Home = () => {
                     {question.content}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs sm:text-sm text-gray-500">
+                    <span className="text-xs sm:text-sm text-gray-500 font-medium">
                       {getCategoryName(question.category)}
                     </span>
                     <div className="flex flex-wrap gap-1 sm:gap-2">
                       {question.tags.slice(0, 2).map((tag, idx) => (
-                        <span key={idx} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                        <span key={idx} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-lg text-xs font-medium border border-indigo-200">
                           {tag}
                         </span>
                       ))}
@@ -477,10 +482,10 @@ const Home = () => {
             <div className="text-center mt-8 sm:mt-10">
               <Link 
                 to="/category/basics"
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
+                className="inline-flex items-center text-indigo-600 hover:text-purple-600 font-bold text-sm sm:text-lg transition-all duration-300"
               >
                 查看更多题目
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -489,20 +494,21 @@ const Home = () => {
 
           {/* Categories Section */}
           <section id="categories" className="mb-8 sm:mb-16 scroll-mt-24">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
+            <h2 className="section-title mb-6 sm:mb-10 text-center">
               📚 知识分类
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {categories.map((category) => (
+              {categories.map((category, index) => (
                 <Link 
                   key={category.id}
                   to={`/category/${category.id}`}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 border border-gray-100 group"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-4 sm:p-6 border border-gray-100 group card-hover animate-fadeInUp"
+                  style={{ animationDelay: `${index * 0.05}s` }}
                 >
-                  <div className={`w-12 h-12 sm:w-14 sm:h-14 ${category.color} rounded-lg flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-200`}>
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 ${category.color} rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
                     {category.icon}
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">{category.name}</h3>
                   <p className="text-gray-600 text-sm">{category.description}</p>
                 </Link>
               ))}
@@ -511,10 +517,10 @@ const Home = () => {
 
           {/* Official Documentation Links */}
           <section id="docs" className="mb-8 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 text-center">
+            <h2 className="section-title mb-2 text-center">
               🔧 开发工具箱
             </h2>
-            <p className="text-gray-600 text-center mb-6 sm:mb-8 text-sm sm:text-base">
+            <p className="text-gray-600 text-center mb-6 sm:mb-10 text-sm sm:text-lg">
               Java开发者必备的官方文档和工具，包含详细使用教程
             </p>
             
@@ -525,13 +531,13 @@ const Home = () => {
           </section>
 
           {/* AI Tools Navigation - Moved to bottom */}
-          <section id="ai-tools" className="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 py-8 sm:py-12 rounded-2xl">
+          <section id="ai-tools" className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 py-8 sm:py-12 rounded-3xl shadow-2xl mb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-6 sm:mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3 flex items-center justify-center">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3 flex items-center justify-center">
                   <span className="mr-2 sm:mr-3">🤖</span> AI工具导航
                 </h2>
-                <p className="text-indigo-200 text-sm sm:text-lg">精心整理的热门AI工具，助力开发者提升效率</p>
+                <p className="text-indigo-100 text-sm sm:text-lg md:text-xl">精心整理的热门AI工具，助力开发者提升效率</p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
                 {aiTools.map((tool) => (
@@ -543,7 +549,7 @@ const Home = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-gray-400 py-6 sm:py-8">
+        <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-gray-300 py-6 sm:py-8 border-t border-gray-700">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <p className="text-xs sm:text-sm">
               © 2024 Java面试题. 帮助每一位开发者准备面试。

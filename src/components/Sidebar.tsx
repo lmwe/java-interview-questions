@@ -45,10 +45,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       )}
       
       {/* Desktop Sidebar */}
-      <aside className="hidden md:block fixed left-0 top-16 h-screen w-64 bg-white shadow-lg overflow-y-auto border-r border-gray-200 z-40">
+      <aside className="hidden md:block fixed left-0 top-16 h-screen w-64 bg-white shadow-xl overflow-y-auto border-r border-gray-100 z-40">
         <div className="p-4">
           <div className="mb-6">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 flex items-center">
+            <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-3 flex items-center">
               <span className="mr-2">🔧</span> 开发工具
             </h3>
             <ul className="space-y-1">
@@ -56,9 +56,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 <li key={item.id}>
                   <button
                     onClick={() => scrollToSection(item.id)}
-                    className="w-full text-left px-4 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-3 text-sm font-medium"
+                    className="w-full text-left px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r from-indigo-50 to-purple-50 hover:text-indigo-700 transition-all duration-300 flex items-center space-x-3 text-sm font-medium group"
                   >
-                    <span className="text-lg">{item.icon}</span>
+                    <span className="text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
                     <span>{item.name}</span>
                   </button>
                 </li>
@@ -67,7 +67,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 flex items-center">
+            <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-3 flex items-center">
               <span className="mr-2">📝</span> 面试题分类
             </h3>
             <ul className="space-y-1">
@@ -75,9 +75,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 <li key={item.id}>
                   <Link
                     to={`/category/${item.id}`}
-                    className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-3 text-sm font-medium"
+                    className="block px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r from-indigo-50 to-purple-50 hover:text-indigo-700 transition-all duration-300 flex items-center space-x-3 text-sm font-medium group"
                   >
-                    <span className="text-lg">{item.icon}</span>
+                    <span className="text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
                     <span>{item.name}</span>
                   </Link>
                 </li>
@@ -88,11 +88,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-lg">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 shadow-xl">
         <div className="flex justify-around items-center py-2">
           <Link
             to="/"
-            className="flex flex-col items-center text-blue-600 p-2"
+            className="flex flex-col items-center text-indigo-600 p-2"
           >
             <span className="text-2xl mb-1">🏠</span>
             <span className="text-xs">首页</span>

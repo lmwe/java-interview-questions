@@ -10,14 +10,14 @@ interface NavbarProps {
 const Navbar = ({ isOpen, onToggle, onClose }: NavbarProps) => {
   return (
     <>
-      <nav className="bg-gradient-to-r from-blue-900 to-blue-700 shadow-lg sticky top-0 z-50">
+      <nav className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 shadow-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
               {/* Mobile Menu Button */}
               <button
                 onClick={onToggle}
-                className="md:hidden text-white hover:text-blue-200 transition-colors"
+                className="md:hidden text-white hover:text-indigo-200 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {isOpen ? (
@@ -36,7 +36,7 @@ const Navbar = ({ isOpen, onToggle, onClose }: NavbarProps) => {
             <div className="hidden md:flex items-center space-x-8">
               <Link 
                 to="/" 
-                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium"
+                className="text-white hover:text-indigo-200 transition-all duration-200 font-medium py-1"
               >
                 首页
               </Link>
@@ -49,7 +49,7 @@ const Navbar = ({ isOpen, onToggle, onClose }: NavbarProps) => {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium flex items-center"
+                className="text-white hover:text-indigo-200 transition-all duration-200 font-medium flex items-center"
               >
                 <span className="mr-1">🤖</span>
                 AI工具
@@ -63,7 +63,7 @@ const Navbar = ({ isOpen, onToggle, onClose }: NavbarProps) => {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium flex items-center"
+                className="text-white hover:text-indigo-200 transition-all duration-200 font-medium flex items-center"
               >
                 <span className="mr-1">🔧</span>
                 工具箱
@@ -77,7 +77,7 @@ const Navbar = ({ isOpen, onToggle, onClose }: NavbarProps) => {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="text-white hover:text-blue-200 transition-colors duration-200 font-medium flex items-center"
+                className="text-white hover:text-indigo-200 transition-all duration-200 font-medium flex items-center"
               >
                 <span className="mr-1">📚</span>
                 知识分类
