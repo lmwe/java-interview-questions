@@ -1236,5 +1236,726 @@ git merge other-branch
 git rebase main
 git stash`,
     tags: ['Git', '版本控制']
+  },
+  {
+    id: 'dp-1',
+    title: '单例模式的实现方式有哪些？',
+    content: '列举单例模式的几种常见实现方式，包括饿汉式、懒汉式、双重检查锁、静态内部类、枚举等，并分析各自的优缺点。',
+    category: 'design-pattern',
+    difficulty: 'easy',
+    answer: '单例模式确保类只有一个实例。常见实现：1)饿汉式（线程安全，类加载时初始化）；2)懒汉式（延迟加载，需同步）；3)双重检查锁（延迟加载+高性能）；4)静态内部类（延迟加载+线程安全）；5)枚举（线程安全+防止反射破坏）。推荐使用枚举或静态内部类。',
+    codeExample: `// 1. 饿汉式
+public class Singleton1 {
+    private static final Singleton1 INSTANCE = new Singleton1();
+    private Singleton1() {}
+    public static Singleton1 getInstance() { return INSTANCE; }
+}
+
+// 2. 懒汉式（线程安全）
+public class Singleton2 {
+    private static Singleton2 instance;
+    private Singleton2() {}
+    public static synchronized Singleton2 getInstance() {
+        if (instance == null) {
+            instance = new Singleton2();
+        }
+        return instance;
+    }
+}
+
+// 3. 双重检查锁（推荐）
+public class Singleton3 {
+    private volatile static Singleton3 instance;
+    private Singleton3() {}
+    public static Singleton3 getInstance() {
+        if (instance == null) {
+            synchronized (Singleton3.class) {
+                if (instance == null) {
+                    instance = new Singleton3();
+                }
+            }
+        }
+        return instance;
+    }
+}
+
+// 4. 静态内部类（推荐）
+public class Singleton4 {
+    private Singleton4() {}
+    private static class Holder {
+        private static final Singleton4 INSTANCE = new Singleton4();
+    }
+    public static Singleton4 getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+
+// 5. 枚举（最佳实践）
+public enum Singleton5 {
+    INSTANCE;
+    public void doSomething() { /* ... */ }
+}`,
+    tags: ['创建型', '单例模式']
+  },
+  {
+    id: 'dp-2',
+    title: '工厂模式的三种形式',
+    content: '解释简单工厂、工厂方法和抽象工厂三种模式的区别、适用场景和优缺点。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '工厂模式用于封装对象的创建过程。1)简单工厂：一个工厂类创建所有对象，违反开闭原则；2)工厂方法：每个产品有对应的工厂，符合开闭原则；3)抽象工厂：创建一组相关对象，解决产品族问题。Spring的BeanFactory就是抽象工厂模式的应用。',
+    codeExample: `// 1. 简单工厂
+public class CarFactory {
+    public static Car createCar(String type) {
+        switch (type) {
+            case "Benz": return new Benz();
+            case "BMW": return new BMW();
+            default: return null;
+        }
+    }
+}
+
+// 2. 工厂方法
+public interface CarFactory {
+    Car createCar();
+}
+public class BenzFactory implements CarFactory {
+    public Car createCar() { return new Benz(); }
+}
+public class BMWFactory implements CarFactory {
+    public Car createCar() { return new BMW(); }
+}
+
+// 3. 抽象工厂 - 创建产品族
+public interface AbstractFactory {
+    Car createCar();
+    Engine createEngine();
+}
+public class LuxuryFactory implements AbstractFactory {
+    public Car createCar() { return new LuxuryCar(); }
+    public Engine createEngine() { return new V8Engine(); }
+}
+public class EconomyFactory implements AbstractFactory {
+    public Car createCar() { return new EconomyCar(); }
+    public Engine createEngine() { return new I4Engine(); }
+}`,
+    tags: ['创建型', '工厂模式']
+  },
+  {
+    id: 'dp-3',
+    title: '建造者模式的应用场景',
+    content: '解释建造者模式的设计思想，分析其适用场景，并举例说明在Java中的应用。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '建造者模式将复杂对象的构建与表示分离，使同样的构建过程可以创建不同的表示。适用场景：1)对象有多个可选属性；2)对象创建过程复杂；3)需要生成不同表示的对象。Java中的StringBuilder、Lombok的@Builder注解都是建造者模式的应用。',
+    codeExample: `// 建造者模式实现
+public class User {
+    private final String name;
+    private final int age;
+    private final String email;
+    private final String phone;
+    
+    private User(Builder builder) {
+        this.name = builder.name;
+        this.age = builder.age;
+        this.email = builder.email;
+        this.phone = builder.phone;
+    }
+    
+    public static class Builder {
+        private String name;
+        private int age;
+        private String email;
+        private String phone;
+        
+        public Builder name(String name) { this.name = name; return this; }
+        public Builder age(int age) { this.age = age; return this; }
+        public Builder email(String email) { this.email = email; return this; }
+        public Builder phone(String phone) { this.phone = phone; return this; }
+        
+        public User build() {
+            if (name == null) throw new IllegalStateException("name is required");
+            return new User(this);
+        }
+    }
+}
+
+// 使用
+User user = new User.Builder()
+    .name("张三")
+    .age(28)
+    .email("zhangsan@example.com")
+    .phone("13800138000")
+    .build();
+
+// Lombok简化
+@Builder
+public class User {
+    private String name;
+    private int age;
+    private String email;
+}
+
+// Java StringBuilder也是建造者模式
+StringBuilder sb = new StringBuilder()
+    .append("Hello")
+    .append(" ")
+    .append("World")
+    .reverse();`,
+    tags: ['创建型', '建造者模式']
+  },
+  {
+    id: 'dp-4',
+    title: '原型模式的深拷贝和浅拷贝',
+    content: '解释原型模式的概念，区分浅拷贝和深拷贝，并说明如何实现深拷贝。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '原型模式通过复制已有对象创建新对象，避免重复初始化。浅拷贝只复制基本类型和引用，不复制引用指向的对象。深拷贝会递归复制所有对象。实现方式：1)实现Cloneable接口并重写clone()方法；2)使用序列化/反序列化；3)手动递归复制。',
+    codeExample: `// 浅拷贝
+public class Person implements Cloneable {
+    private String name;
+    private Address address; // 引用类型
+    
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone(); // 浅拷贝，address引用相同
+    }
+}
+
+// 深拷贝 - 方式1：重写clone()
+public class Person implements Cloneable {
+    private String name;
+    private Address address;
+    
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Person clone = (Person) super.clone();
+        clone.address = (Address) address.clone(); // 递归拷贝
+        return clone;
+    }
+}
+
+// 深拷贝 - 方式2：序列化
+public class Person implements Serializable {
+    private String name;
+    private Address address;
+    
+    public Person deepCopy() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Person) ois.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}`,
+    tags: ['创建型', '原型模式']
+  },
+  {
+    id: 'dp-5',
+    title: '适配器模式的两种形式',
+    content: '解释类适配器和对象适配器的区别，分析各自的优缺点和适用场景。',
+    category: 'design-pattern',
+    difficulty: 'easy',
+    answer: '适配器模式将一个类的接口转换成客户希望的另一个接口。类适配器使用继承，对象适配器使用组合。类适配器：优点是可以重写适配者的方法，缺点是Java只能单继承限制了灵活性。对象适配器：优点是更灵活、符合组合优于继承原则，缺点是不能重写适配者的方法。推荐使用对象适配器。',
+    codeExample: `// 目标接口
+public interface Target {
+    void request();
+}
+
+// 适配者
+public class Adaptee {
+    public void specificRequest() {
+        System.out.println("Adaptee specific request");
+    }
+}
+
+// 1. 类适配器 - 使用继承
+public class ClassAdapter extends Adaptee implements Target {
+    @Override
+    public void request() {
+        specificRequest();
+    }
+}
+
+// 2. 对象适配器 - 使用组合（推荐）
+public class ObjectAdapter implements Target {
+    private Adaptee adaptee;
+    
+    public ObjectAdapter(Adaptee adaptee) {
+        this.adaptee = adaptee;
+    }
+    
+    @Override
+    public void request() {
+        adaptee.specificRequest();
+    }
+}
+
+// 使用
+Target target1 = new ClassAdapter();
+target1.request();
+
+Target target2 = new ObjectAdapter(new Adaptee());
+target2.request();
+
+// Java中的实际应用
+// Arrays.asList() 返回的List不支持add/remove
+// Collections.synchronizedList() 也是适配器模式`,
+    tags: ['结构型', '适配器模式']
+  },
+  {
+    id: 'dp-6',
+    title: '装饰器模式的应用',
+    content: '解释装饰器模式的设计思想，举例说明其在Java中的实际应用（如IO流）。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '装饰器模式动态地给对象添加额外功能，比继承更灵活。特点：1)装饰器和被装饰者实现相同接口；2)装饰器持有被装饰者引用；3)可以嵌套多个装饰器。Java IO流是典型应用：InputStream作为抽象组件，FileInputStream是具体组件，BufferedInputStream、DataInputStream是装饰器。',
+    codeExample: `// 抽象组件
+public interface Coffee {
+    double cost();
+    String description();
+}
+
+// 具体组件
+public class SimpleCoffee implements Coffee {
+    @Override
+    public double cost() { return 5.0; }
+    @Override
+    public String description() { return "纯咖啡"; }
+}
+
+// 抽象装饰器
+public abstract class CoffeeDecorator implements Coffee {
+    protected Coffee decoratedCoffee;
+    public CoffeeDecorator(Coffee coffee) {
+        this.decoratedCoffee = coffee;
+    }
+}
+
+// 具体装饰器
+public class MilkDecorator extends CoffeeDecorator {
+    public MilkDecorator(Coffee coffee) { super(coffee); }
+    @Override
+    public double cost() { return decoratedCoffee.cost() + 2.0; }
+    @Override
+    public String description() { return decoratedCoffee.description() + " + 牛奶"; }
+}
+
+public class SugarDecorator extends CoffeeDecorator {
+    public SugarDecorator(Coffee coffee) { super(coffee); }
+    @Override
+    public double cost() { return decoratedCoffee.cost() + 1.0; }
+    @Override
+    public String description() { return decoratedCoffee.description() + " + 糖"; }
+}
+
+// 使用 - 嵌套装饰
+Coffee coffee = new SimpleCoffee();
+coffee = new MilkDecorator(coffee);
+coffee = new SugarDecorator(coffee);
+System.out.println(coffee.description()); // 纯咖啡 + 牛奶 + 糖
+System.out.println(coffee.cost()); // 8.0
+
+// Java IO中的装饰器模式
+InputStream is = new FileInputStream("file.txt");
+is = new BufferedInputStream(is);      // 添加缓冲
+is = new DataInputStream(is);          // 添加数据读取功能`,
+    tags: ['结构型', '装饰器模式']
+  },
+  {
+    id: 'dp-7',
+    title: '代理模式的三种形式',
+    content: '解释静态代理、动态代理（JDK）和CGLIB代理的区别和适用场景。',
+    category: 'design-pattern',
+    difficulty: 'hard',
+    answer: '代理模式为其他对象提供代理以控制访问。1)静态代理：手动编写代理类，不灵活；2)JDK动态代理：基于接口，运行时生成代理类，性能较好；3)CGLIB代理：基于继承，无需接口，性能略低。Spring AOP默认使用JDK动态代理，没有接口时使用CGLIB。',
+    codeExample: `// 1. 静态代理
+public interface UserService {
+    void add();
+}
+public class UserServiceImpl implements UserService {
+    public void add() { System.out.println("添加用户"); }
+}
+public class UserServiceProxy implements UserService {
+    private UserService target;
+    public UserServiceProxy(UserService target) { this.target = target; }
+    public void add() {
+        System.out.println("开始事务");
+        target.add();
+        System.out.println("提交事务");
+    }
+}
+
+// 2. JDK动态代理
+public class JDKProxy implements InvocationHandler {
+    private Object target;
+    public JDKProxy(Object target) { this.target = target; }
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("前置增强");
+        Object result = method.invoke(target, args);
+        System.out.println("后置增强");
+        return result;
+    }
+}
+// 使用
+UserService proxy = (UserService) Proxy.newProxyInstance(
+    UserService.class.getClassLoader(),
+    new Class[]{UserService.class},
+    new JDKProxy(new UserServiceImpl())
+);
+
+// 3. CGLIB代理
+public class CGLIBProxy implements MethodInterceptor {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        System.out.println("前置增强");
+        Object result = proxy.invokeSuper(obj, args);
+        System.out.println("后置增强");
+        return result;
+    }
+}
+// 使用
+Enhancer enhancer = new Enhancer();
+enhancer.setSuperclass(UserServiceImpl.class);
+enhancer.setCallback(new CGLIBProxy());
+UserService proxy = (UserService) enhancer.create();`,
+    tags: ['结构型', '代理模式', 'AOP']
+  },
+  {
+    id: 'dp-8',
+    title: '观察者模式的实现',
+    content: '解释观察者模式的设计思想，说明其在Java中的应用（如JavaFX、Spring事件机制）。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '观察者模式定义对象间一对多依赖，当主题状态改变时所有观察者自动收到通知。Java内置支持：Observable类和Observer接口（已过时）。现代应用：JavaFX的Property/Listener机制、Spring的ApplicationEventPublisher、Guava的EventBus。',
+    codeExample: `// 自定义观察者模式
+public interface Subject {
+    void registerObserver(Observer observer);
+    void removeObserver(Observer observer);
+    void notifyObservers();
+}
+
+public interface Observer {
+    void update(String message);
+}
+
+public class ConcreteSubject implements Subject {
+    private List<Observer> observers = new ArrayList<>();
+    private String message;
+    
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+    
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+    
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(message);
+        }
+    }
+    
+    public void setMessage(String message) {
+        this.message = message;
+        notifyObservers();
+    }
+}
+
+public class ConcreteObserver implements Observer {
+    private String name;
+    public ConcreteObserver(String name) { this.name = name; }
+    @Override
+    public void update(String message) {
+        System.out.println(name + "收到消息: " + message);
+    }
+}
+
+// 使用
+Subject subject = new ConcreteSubject();
+subject.registerObserver(new ConcreteObserver("张三"));
+subject.registerObserver(new ConcreteObserver("李四"));
+subject.setMessage("Hello World!");
+
+// Spring事件机制
+@Component
+public class MyEventListener implements ApplicationListener<MyEvent> {
+    @Override
+    public void onApplicationEvent(MyEvent event) {
+        System.out.println("收到事件: " + event.getMessage());
+    }
+}
+// 发布事件
+applicationEventPublisher.publishEvent(new MyEvent("hello"));`,
+    tags: ['行为型', '观察者模式']
+  },
+  {
+    id: 'dp-9',
+    title: '策略模式的应用场景',
+    content: '解释策略模式的设计思想，说明如何用策略模式消除大量的if-else语句。',
+    category: 'design-pattern',
+    difficulty: 'easy',
+    answer: '策略模式定义一系列算法，封装每个算法，并使它们可以互换。策略模式让算法独立于使用它的客户。适用场景：1)有多种相似算法；2)算法需要动态切换；3)消除大量if-else分支。Java中的Comparator接口就是策略模式的应用。',
+    codeExample: `// 策略接口
+public interface PaymentStrategy {
+    void pay(double amount);
+}
+
+// 具体策略
+public class CreditCardPayment implements PaymentStrategy {
+    private String cardNumber;
+    public CreditCardPayment(String cardNumber) { this.cardNumber = cardNumber; }
+    @Override
+    public void pay(double amount) {
+        System.out.println("信用卡支付: " + amount + "元");
+    }
+}
+
+public class WeChatPayment implements PaymentStrategy {
+    private String openId;
+    public WeChatPayment(String openId) { this.openId = openId; }
+    @Override
+    public void pay(double amount) {
+        System.out.println("微信支付: " + amount + "元");
+    }
+}
+
+public class AlipayPayment implements PaymentStrategy {
+    private String account;
+    public AlipayPayment(String account) { this.account = account; }
+    @Override
+    public void pay(double amount) {
+        System.out.println("支付宝支付: " + amount + "元");
+    }
+}
+
+// 上下文
+public class ShoppingCart {
+    private PaymentStrategy paymentStrategy;
+    
+    public void setPaymentStrategy(PaymentStrategy strategy) {
+        this.paymentStrategy = strategy;
+    }
+    
+    public void checkout(double amount) {
+        paymentStrategy.pay(amount);
+    }
+}
+
+// 使用
+ShoppingCart cart = new ShoppingCart();
+cart.setPaymentStrategy(new WeChatPayment("openid123"));
+cart.checkout(100.0);
+
+// 消除if-else对比
+// 传统方式（不推荐）
+if (type.equals("wechat")) { /* ... */ }
+else if (type.equals("alipay")) { /* ... */ }
+else if (type.equals("credit")) { /* ... */ }
+
+// 策略模式（推荐）
+Map<String, PaymentStrategy> strategies = new HashMap<>();
+strategies.put("wechat", new WeChatPayment(openId));
+strategies.put("alipay", new AlipayPayment(account));
+strategies.get(type).pay(amount);`,
+    tags: ['行为型', '策略模式']
+  },
+  {
+    id: 'dp-10',
+    title: '模板方法模式的实现',
+    content: '解释模板方法模式的设计思想，说明其在Spring框架中的应用。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '模板方法模式定义算法骨架，将某些步骤延迟到子类实现。父类控制算法流程，子类实现具体步骤。特点：1)父类定义算法框架；2)子类实现抽象方法；3)钩子方法可选覆盖。Spring的AbstractApplicationContext的refresh()方法就是模板方法模式的典型应用。',
+    codeExample: `// 抽象类定义模板方法
+public abstract class AbstractGame {
+    // 模板方法 - 定义算法骨架
+    public final void play() {
+        initialize();
+        startPlay();
+        endPlay();
+    }
+    
+    protected abstract void initialize();
+    protected abstract void startPlay();
+    protected abstract void endPlay();
+    
+    // 钩子方法 - 可选覆盖
+    protected void pause() {
+        // 默认实现为空
+    }
+}
+
+// 具体类实现步骤
+public class Cricket extends AbstractGame {
+    @Override
+    protected void initialize() {
+        System.out.println("板球游戏初始化");
+    }
+    
+    @Override
+    protected void startPlay() {
+        System.out.println("板球游戏开始");
+    }
+    
+    @Override
+    protected void endPlay() {
+        System.out.println("板球游戏结束");
+    }
+}
+
+public class Football extends AbstractGame {
+    @Override
+    protected void initialize() {
+        System.out.println("足球游戏初始化");
+    }
+    
+    @Override
+    protected void startPlay() {
+        System.out.println("足球游戏开始");
+    }
+    
+    @Override
+    protected void endPlay() {
+        System.out.println("足球游戏结束");
+    }
+    
+    @Override
+    protected void pause() {
+        System.out.println("足球暂停");
+    }
+}
+
+// 使用
+AbstractGame game = new Cricket();
+game.play();
+
+// Spring中的应用
+// AbstractApplicationContext.refresh()方法定义了容器初始化的模板
+// 子类实现抽象方法 customizeContext()、refreshBeanFactory()等`,
+    tags: ['行为型', '模板方法模式']
+  },
+  {
+    id: 'dp-11',
+    title: '责任链模式的应用',
+    content: '解释责任链模式的设计思想，说明其在Spring Security中的应用。',
+    category: 'design-pattern',
+    difficulty: 'medium',
+    answer: '责任链模式将请求沿着链传递，直到有一个处理者处理它。每个处理者可以选择处理请求或传递给下一个。适用场景：1)多个对象可以处理同一请求；2)请求处理者不明确；3)动态组合处理者。Spring Security的FilterChain、Servlet的Filter链都是责任链模式的应用。',
+    codeExample: `// 抽象处理者
+public abstract class Handler {
+    protected Handler next;
+    
+    public void setNext(Handler next) {
+        this.next = next;
+    }
+    
+    public abstract void handleRequest(String request);
+}
+
+// 具体处理者
+public class AuthenticationHandler extends Handler {
+    @Override
+    public void handleRequest(String request) {
+        if (request.contains("auth")) {
+            System.out.println("AuthenticationHandler处理请求");
+        } else if (next != null) {
+            next.handleRequest(request);
+        }
+    }
+}
+
+public class AuthorizationHandler extends Handler {
+    @Override
+    public void handleRequest(String request) {
+        if (request.contains("authz")) {
+            System.out.println("AuthorizationHandler处理请求");
+        } else if (next != null) {
+            next.handleRequest(request);
+        }
+    }
+}
+
+public class LoggingHandler extends Handler {
+    @Override
+    public void handleRequest(String request) {
+        System.out.println("LoggingHandler记录日志");
+        if (next != null) {
+            next.handleRequest(request);
+        }
+    }
+}
+
+// 使用 - 构建责任链
+Handler logger = new LoggingHandler();
+Handler auth = new AuthenticationHandler();
+Handler authz = new AuthorizationHandler();
+
+logger.setNext(auth);
+auth.setNext(authz);
+
+logger.handleRequest("auth request");
+
+// Spring Security中的责任链
+// FilterChainProxy包含多个Filter，按顺序执行
+// UsernamePasswordAuthenticationFilter -> BasicAuthenticationFilter -> ...`,
+    tags: ['行为型', '责任链模式']
+  },
+  {
+    id: 'dp-12',
+    title: '设计模式在Spring框架中的应用',
+    content: '列举Spring框架中使用的主要设计模式，并说明它们的具体应用场景。',
+    category: 'design-pattern',
+    difficulty: 'hard',
+    answer: 'Spring框架广泛应用设计模式：1)工厂模式（BeanFactory、ApplicationContext）；2)单例模式（默认Bean作用域）；3)代理模式（AOP）；4)策略模式（Resource、TransactionDefinition）；5)模板方法模式（JdbcTemplate、AbstractApplicationContext）；6)观察者模式（ApplicationEvent）；7)责任链模式（FilterChainProxy）；8)适配器模式（HandlerAdapter）；9)装饰器模式（BeanWrapper）。',
+    codeExample: `// 1. 工厂模式
+ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+UserService service = context.getBean(UserService.class);
+
+// 2. 单例模式
+// @Scope("singleton") - 默认
+@Service
+public class UserService { /* ... */ }
+
+// 3. 代理模式 - AOP
+@Aspect
+@Component
+public class LogAspect {
+    @Around("execution(* com.example.service.*.*(..))")
+    public Object log(ProceedingJoinPoint pjp) throws Throwable {
+        System.out.println("方法开始");
+        Object result = pjp.proceed();
+        System.out.println("方法结束");
+        return result;
+    }
+}
+
+// 4. 策略模式 - 事务传播行为
+@Transactional(propagation = Propagation.REQUIRED)
+public void method() { /* ... */ }
+
+// 5. 模板方法模式 - JdbcTemplate
+jdbcTemplate.query("SELECT * FROM users", (rs, rowNum) -> 
+    new User(rs.getLong("id"), rs.getString("name"))
+);
+
+// 6. 观察者模式 - 事件
+applicationEventPublisher.publishEvent(new MyEvent(this, "data"));
+
+// 7. 责任链模式 - Filter链
+// SecurityFilterChain
+
+// 8. 适配器模式 - MVC HandlerAdapter
+// RequestMappingHandlerAdapter`,
+    tags: ['设计模式', 'Spring']
   }
 ];

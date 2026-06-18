@@ -18,6 +18,7 @@ const navItems: NavItem[] = [
   { id: 'concurrent', name: '并发编程', icon: '⚡', type: 'question' },
   { id: 'jvm', name: 'JVM原理', icon: '🔧', type: 'question' },
   { id: 'advanced', name: '高级特性', icon: '🚀', type: 'question' },
+  { id: 'design-pattern', name: '设计模式', icon: '🎨', type: 'question' },
 ];
 
 interface SidebarProps {

@@ -42,5 +42,12 @@ export const categories: Category[] = [
     icon: '🚀',
     color: 'bg-indigo-500',
     description: '反射、注解、泛型、Lambda表达式等高级特性'
+  },
+  {
+    id: 'design-pattern',
+    name: '设计模式',
+    icon: '🎨',
+    color: 'bg-teal-500',
+    description: 'GoF设计模式：创建型、结构型、行为型模式'
   }
 ];
