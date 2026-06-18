@@ -19,6 +19,7 @@ const navItems: NavItem[] = [
   { id: 'jvm', name: 'JVM原理', icon: '🔧', type: 'question' },
   { id: 'advanced', name: '高级特性', icon: '🚀', type: 'question' },
   { id: 'design-pattern', name: '设计模式', icon: '🎨', type: 'question' },
+  { id: 'microservice', name: '微服务与分布式', icon: '🌐', type: 'question' },
 ];
 
 interface SidebarProps {

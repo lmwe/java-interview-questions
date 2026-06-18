@@ -49,5 +49,12 @@ export const categories: Category[] = [
     icon: '🎨',
     color: 'bg-teal-500',
     description: 'GoF设计模式：创建型、结构型、行为型模式'
+  },
+  {
+    id: 'microservice',
+    name: '微服务与分布式',
+    icon: '🌐',
+    color: 'bg-cyan-500',
+    description: '微服务架构、分布式系统、Spring Cloud、服务治理'
   }
 ];

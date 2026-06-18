@@ -1957,5 +1957,1210 @@ applicationEventPublisher.publishEvent(new MyEvent(this, "data"));
 // 8. 适配器模式 - MVC HandlerAdapter
 // RequestMappingHandlerAdapter`,
     tags: ['设计模式', 'Spring']
+  },
+  {
+    id: 'ms-1',
+    title: '什么是微服务架构？',
+    content: '解释微服务架构的概念、特点，以及与单体架构的区别。',
+    category: 'microservice',
+    difficulty: 'easy',
+    answer: '微服务架构是将应用拆分为多个小型、独立部署的服务。特点：1)服务独立部署、独立扩展；2)服务间通过API通信；3)每个服务专注单一业务；4)可使用不同技术栈。与单体架构对比：单体架构部署简单但扩展困难，微服务灵活但运维复杂。',
+    codeExample: `// 单体架构示例 - 所有功能在一个应用中
+@SpringBootApplication
+public class MonolithApplication {
+    // 用户模块
+    @RestController
+    class UserController { /* ... */ }
+    
+    // 订单模块
+    @RestController
+    class OrderController { /* ... */ }
+    
+    // 商品模块
+    @RestController
+    class ProductController { /* ... */ }
+}
+
+// 微服务架构示例 - 拆分为独立服务
+// 用户服务（独立部署）
+@SpringBootApplication
+public class UserServiceApplication {
+    @RestController
+    class UserController {
+        @GetMapping("/users/{id}")
+        public User getUser(@PathVariable Long id) {
+            return userService.findById(id);
+        }
+    }
+}
+
+// 订单服务（独立部署）
+@SpringBootApplication
+public class OrderServiceApplication {
+    @RestController
+    class OrderController {
+        @PostMapping("/orders")
+        public Order createOrder(@RequestBody OrderDTO dto) {
+            // 通过Feign调用用户服务
+            User user = userClient.getUser(dto.getUserId());
+            return orderService.create(dto, user);
+        }
+    }
+}
+
+// 商品服务（独立部署）
+@SpringBootApplication
+public class ProductServiceApplication { /* ... */ }`,
+    tags: ['微服务', '架构设计']
+  },
+  {
+    id: 'ms-2',
+    title: 'Spring Cloud核心组件有哪些？',
+    content: '列举Spring Cloud的核心组件及其作用，包括服务注册发现、配置中心、负载均衡、服务调用、网关等。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: 'Spring Cloud核心组件：1)Eureka/Nacos（服务注册发现）；2)Config/Nacos Config（配置中心）；3)Ribbon/LoadBalancer（负载均衡）；4)Feign/OpenFeign（声明式服务调用）；5)Gateway/Zuul（API网关）；6)Hystrix/Sentinel（服务熔断降级）；7)Sleuth+Zipkin（链路追踪）。',
+    codeExample: `// 1. Eureka服务注册中心
+@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+
+// application.yml
+server:
+  port: 8761
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+// 2. 服务注册到Eureka
+@SpringBootApplication
+@EnableDiscoveryClient
+public class UserServiceApplication { /* ... */ }
+
+// application.yml
+spring:
+  application:
+    name: user-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+// 3. Feign声明式调用
+@FeignClient(name = "user-service")
+public interface UserClient {
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable("id") Long id);
+}
+
+@Service
+public class OrderService {
+    @Autowired
+    private UserClient userClient;
+    
+    public Order createOrder(Long userId) {
+        User user = userClient.getUser(userId); // 远程调用
+        return new Order(user);
+    }
+}
+
+// 4. Gateway网关配置
+@SpringBootApplication
+public class GatewayApplication { /* ... */ }
+
+// application.yml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**`,
+    tags: ['Spring Cloud', '服务治理']
+  },
+  {
+    id: 'ms-3',
+    title: '服务注册与发现的原理',
+    content: '解释服务注册发现的工作原理，包括注册中心、服务提供者、服务消费者的交互流程。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: '服务注册发现流程：1)服务启动时向注册中心注册（发送服务名、IP、端口）；2)注册中心维护服务列表并定时心跳检测；3)服务消费者从注册中心获取服务列表；4)消费者通过负载均衡选择服务实例调用；5)服务下线时注册中心剔除。心跳机制保证服务列表实时更新。',
+    codeExample: `// Eureka服务注册流程
+// 1. 服务提供者注册
+@RestController
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ProviderApplication {
+    @Value("\${server.port}")
+    private int port;
+    
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello from port: " + port;
+    }
+    
+    // 启动时自动注册到Eureka
+    // spring.application.name=provider-service
+    // eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+}
+
+// 2. 服务消费者发现并调用
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ConsumerApplication {
+    @Autowired
+    private DiscoveryClient discoveryClient;
+    
+    @Autowired
+    private LoadBalancer loadBalancer;
+    
+    @GetMapping("/invoke")
+    public String invoke() {
+        // 从注册中心获取服务实例列表
+        List<ServiceInstance> instances = discoveryClient.getInstances("provider-service");
+        
+        // 负载均衡选择一个实例
+        ServiceInstance instance = loadBalancer.choose(instances);
+        
+        // 调用服务
+        String url = instance.getUri() + "/hello";
+        return restTemplate.getForObject(url, String.class);
+    }
+}
+
+// 3. Nacos注册中心配置（推荐）
+spring:
+  application:
+    name: user-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+        group: DEFAULT_GROUP`,
+    tags: ['服务注册', 'Eureka', 'Nacos']
+  },
+  {
+    id: 'ms-4',
+    title: '负载均衡策略有哪些？',
+    content: '解释客户端负载均衡和服务端负载均衡的区别，列举常见的负载均衡策略。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: '负载均衡分为客户端（Ribbon/LoadBalancer）和服务端（Nginx）。常见策略：1)轮询（RoundRobin）：依次调用；2)随机（Random）：随机选择；3)加权轮询：按权重分配；4)最少连接：选择连接数最少的服务；5)IP哈希：相同IP请求同一服务。Spring Cloud LoadBalancer默认轮询。',
+    codeExample: `// Ribbon负载均衡配置（已废弃，使用Spring Cloud LoadBalancer）
+// 1. 自定义负载均衡策略
+@Configuration
+public class LoadBalancerConfig {
+    @Bean
+    ReactorLoadBalancer<ServiceInstance> randomLoadBalancer(Environment environment, LoadBalancerClientFactory factory) {
+        String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
+        return new RandomLoadBalancer(factory.getLazyProvider(name, ServiceInstanceListSupplier.class), name);
+    }
+}
+
+// 2. 使用@LoadBalancerClient指定策略
+@LoadBalancerClient(name = "user-service", configuration = LoadBalancerConfig.class)
+public interface UserClient {
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable("id") Long id);
+}
+
+// 3. Nginx服务端负载均衡配置
+upstream backend {
+    # 轮询（默认）
+    server 192.168.1.1:8080;
+    server 192.168.1.2:8080;
+    
+    # 加权轮询
+    server 192.168.1.3:8080 weight=3;
+    server 192.168.1.4:8080 weight=1;
+    
+    # IP哈希
+    ip_hash;
+    server 192.168.1.5:8080;
+    server 192.168.1.6:8080;
+}
+
+server {
+    location /api/ {
+        proxy_pass http://backend;
+    }
+}
+
+// 4. 自定义负载均衡算法
+public class WeightedLoadBalancer implements ReactorServiceInstanceLoadBalancer {
+    private final List<ServiceInstance> instances;
+    private final Map<String, Integer> weights;
+    
+    public Mono<Response<ServiceInstance>> choose(Request request) {
+        // 根据权重选择实例
+        int totalWeight = weights.values().stream().mapToInt(Integer::intValue).sum();
+        int random = ThreadLocalRandom.current().nextInt(totalWeight);
+        
+        int current = 0;
+        for (ServiceInstance instance : instances) {
+            current += weights.get(instance.getInstanceId());
+            if (random < current) {
+                return Mono.just(new DefaultResponse(instance));
+            }
+        }
+        return Mono.just(new DefaultResponse(instances.get(0)));
+    }
+}`,
+    tags: ['负载均衡', 'Ribbon', 'Nginx']
+  },
+  {
+    id: 'ms-5',
+    title: '服务熔断与降级',
+    content: '解释服务熔断、降级的概念，说明Sentinel/Hystrix的实现原理和使用方式。',
+    category: 'microservice',
+    difficulty: 'hard',
+    answer: '熔断：当服务异常率达到阈值时，自动切断调用，防止雪崩效应。降级：服务不可用时返回兜底响应。Sentinel原理：1)定义资源；2)配置规则（QPS、线程数、响应时间）；3)触发规则时执行降级逻辑。状态转换：关闭→开启→半开→关闭。推荐使用Sentinel（阿里巴巴开源）。',
+    codeExample: `// Sentinel熔断降级示例
+// 1. 引入依赖
+// <dependency>
+//     <groupId>com.alibaba.cloud</groupId>
+//     <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+// </dependency>
+
+// 2. 定义资源并配置降级逻辑
+@Service
+public class UserService {
+    @SentinelResource(
+        value = "getUser",
+        fallback = "getUserFallback",      // 降级方法
+        blockHandler = "getUserBlockHandler" // 熔断方法
+    )
+    public User getUser(Long id) {
+        // 可能失败的远程调用
+        return userClient.getUser(id);
+    }
+    
+    // 降级逻辑 - 业务异常时执行
+    public User getUserFallback(Long id, Throwable ex) {
+        log.error("获取用户失败，执行降级", ex);
+        return new User(id, "默认用户", "default@example.com");
+    }
+    
+    // 熔断逻辑 - 触发规则时执行
+    public User getUserBlockHandler(Long id, BlockException ex) {
+        log.warn("触发熔断规则", ex);
+        return new User(id, "熔断用户", "blocked@example.com");
+    }
+}
+
+// 3. 配置熔断规则
+// application.yml
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  # Sentinel控制台
+
+// 4. 代码配置规则
+@Configuration
+public class SentinelConfig {
+    @PostConstruct
+    public void initRules() {
+        // 熔断规则：异常比例超过50%时熔断
+        DegradeRule degradeRule = new DegradeRule("getUser");
+        degradeRule.setGrade(CircuitBreakerStrategy.ERROR_RATIO.getType());
+        degradeRule.setCount(0.5);  // 异常比例阈值
+        degradeRule.setTimeWindow(10);  // 熔断持续时间10秒
+        degradeRule.setMinRequestAmount(5);  // 最小请求数
+        
+        DegradeRuleManager.loadDegradeRules(Collections.singletonList(degradeRule));
+        
+        // 流控规则：QPS限制
+        FlowRule flowRule = new FlowRule("getUser");
+        flowRule.setCount(10);  // 每秒最多10次
+        flowRule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        
+        FlowRuleManager.loadRules(Collections.singletonList(flowRule));
+    }
+}
+
+// 5. Hystrix示例（已停止维护）
+@HystrixCommand(
+    fallbackMethod = "getUserFallback",
+    commandProperties = {
+        @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),
+        @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+        @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+    }
+)
+public User getUser(Long id) {
+    return userClient.getUser(id);
+}`,
+    tags: ['熔断降级', 'Sentinel', 'Hystrix']
+  },
+  {
+    id: 'ms-6',
+    title: '分布式事务解决方案',
+    content: '解释分布式事务的问题，列举常见的解决方案（2PC、3PC、TCC、Saga、本地消息表、Seata）。',
+    category: 'microservice',
+    difficulty: 'hard',
+    answer: '分布式事务保证跨服务数据一致性。解决方案：1)2PC（两阶段提交）：Prepare→Commit，强一致但阻塞；2)TCC（Try-Confirm-Cancel）：业务层面实现，最终一致；3)Saga：长事务拆分+补偿机制；4)本地消息表：异步确保；5)Seata：AT模式（自动补偿）、TCC模式、Saga模式。推荐使用Seata AT模式。',
+    codeExample: `// Seata分布式事务示例
+// 1. 引入依赖
+// <dependency>
+//     <groupId>io.seata</groupId>
+//     <artifactId>seata-spring-boot-starter</artifactId>
+//     <version>1.5.2</version>
+// </dependency>
+
+// 2. 配置Seata
+// application.yml
+seata:
+  enabled: true
+  tx-service-group: my_tx_group
+  service:
+    vgroup-mapping:
+      my_tx_group: default
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+
+// 3. AT模式 - 自动分布式事务
+@Service
+public class OrderService {
+    @Autowired
+    private OrderMapper orderMapper;
+    
+    @Autowired
+    private StorageClient storageClient;
+    
+    @Autowired
+    private AccountClient accountClient;
+    
+    @GlobalTransactional(name = "create-order", rollbackFor = Exception.class)
+    public void createOrder(OrderDTO orderDTO) {
+        // 创建订单（本地事务）
+        orderMapper.insert(orderDTO);
+        
+        // 扣减库存（远程调用，Seata自动管理）
+        storageClient.decrease(orderDTO.getProductId(), orderDTO.getCount());
+        
+        // 扣减余额（远程调用）
+        accountClient.decrease(orderDTO.getUserId(), orderDTO.getAmount());
+        
+        // Seata自动生成undo_log，失败时自动回滚
+    }
+}
+
+// 4. TCC模式 - 手动实现Try/Confirm/Cancel
+@LocalTCC
+public interface StorageTccService {
+    @TwoPhaseBusinessAction(name = "prepareDecrease", commitMethod = "commit", rollbackMethod = "rollback")
+    boolean prepareDecrease(@BusinessActionContextParameter(paramName = "productId") Long productId,
+                            @BusinessActionContextParameter(paramName = "count") Integer count);
+    
+    boolean commit(BusinessActionContext context);
+    
+    boolean rollback(BusinessActionContext context);
+}
+
+// TCC实现
+@Service
+public class StorageTccServiceImpl implements StorageTccService {
+    @Autowired
+    private StorageMapper storageMapper;
+    
+    @Override
+    public boolean prepareDecrease(Long productId, Integer count) {
+        // Try阶段：预留库存（冻结）
+        storageMapper.freezeStock(productId, count);
+        return true;
+    }
+    
+    @Override
+    public boolean commit(BusinessActionContext context) {
+        // Confirm阶段：真正扣减库存
+        Long productId = context.getActionContext("productId");
+        Integer count = context.getActionContext("count");
+        storageMapper.decreaseFrozenStock(productId, count);
+        return true;
+    }
+    
+    @Override
+    public boolean rollback(BusinessActionContext context) {
+        // Cancel阶段：释放预留库存
+        Long productId = context.getActionContext("productId");
+        Integer count = context.getActionContext("count");
+        storageMapper.releaseFrozenStock(productId, count);
+        return true;
+    }
+}
+
+// 5. 本地消息表方案
+@Transactional
+public void createOrder(OrderDTO orderDTO) {
+    // 创建订单
+    orderMapper.insert(orderDTO);
+    
+    // 写入本地消息表（同一事务）
+    Message message = new Message();
+    message.setBizId(orderDTO.getId());
+    message.setTopic("order-created");
+    message.setContent(JSON.toJSONString(orderDTO));
+    message.setStatus("PENDING");
+    messageMapper.insert(message);
+}
+
+// 定时任务扫描消息表并发送
+@Scheduled(fixedDelay = 5000)
+public void sendPendingMessages() {
+    List<Message> messages = messageMapper.selectByStatus("PENDING");
+    for (Message message : messages) {
+        try {
+            mqProducer.send(message.getTopic(), message.getContent());
+            messageMapper.updateStatus(message.getId(), "SENT");
+        } catch (Exception e) {
+            // 发送失败，下次重试
+        }
+    }
+}`,
+    tags: ['分布式事务', 'Seata', 'TCC']
+  },
+  {
+    id: 'ms-7',
+    title: 'API网关的作用和实现',
+    content: '解释API网关的核心功能，说明Spring Cloud Gateway的工作原理和配置方式。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: 'API网关是微服务入口，核心功能：1)路由转发；2)负载均衡；3)认证鉴权；4)限流熔断；5)日志监控；6)协议转换。Spring Cloud Gateway基于WebFlux，三大核心概念：Route（路由）、Predicate（断言）、Filter（过滤器）。支持动态路由、自定义过滤器。',
+    codeExample: `// Spring Cloud Gateway配置
+// 1. 基础路由配置
+@SpringBootApplication
+public class GatewayApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
+}
+
+// application.yml
+spring:
+  cloud:
+    gateway:
+      routes:
+        # 用户服务路由
+        - id: user-service
+          uri: lb://user-service  # 负载均衡
+          predicates:
+            - Path=/api/users/**  # 路径匹配
+            - Method=GET,POST     # 方法限制
+          filters:
+            - StripPrefix=1       # 去掉/api前缀
+            - AddRequestHeader=X-Request-Id, \${value}
+        
+        # 订单服务路由
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+            - After=2024-01-01T00:00:00+08:00  # 时间限制
+          filters:
+            - name: RequestRateLimiter  # 限流
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "\${user.id}"
+
+// 2. 自定义过滤器
+@Component
+public class AuthFilter implements GlobalFilter, Ordered {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        
+        // 获取Token
+        String token = request.getHeaders().getFirst("Authorization");
+        if (token == null || !validateToken(token)) {
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.writeWith(Mono.just(response.bufferFactory().wrap("未授权".getBytes())));
+        }
+        
+        // 验证通过，继续执行
+        return chain.filter(exchange);
+    }
+    
+    @Override
+    public int getOrder() {
+        return -100;  // 优先级最高
+    }
+    
+    private boolean validateToken(String token) {
+        // JWT验证逻辑
+        return JwtUtil.verify(token);
+    }
+}
+
+// 3. 动态路由配置
+@RestController
+@RequestMapping("/routes")
+public class RouteController {
+    @Autowired
+    private RouteDefinitionLocator routeDefinitionLocator;
+    
+    @Autowired
+    private RouteDefinitionWriter routeDefinitionWriter;
+    
+    @PostMapping
+    public Mono<Void> addRoute(@RequestBody RouteDefinition definition) {
+        return routeDefinitionWriter.save(Mono.just(definition));
+    }
+    
+    @DeleteMapping("/{id}")
+    public Mono<Void> deleteRoute(@PathVariable String id) {
+        return routeDefinitionWriter.delete(Mono.just(id));
+    }
+}
+
+// 4. 跨域配置
+@Configuration
+public class CorsConfig {
+    @Bean
+    public CorsWebFilter corsWebFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        
+        return new CorsWebFilter(source);
+    }
+}`,
+    tags: ['API网关', 'Gateway', '路由']
+  },
+  {
+    id: 'ms-8',
+    title: '分布式锁的实现方式',
+    content: '解释分布式锁的作用，列举常见的实现方式（Redis、Zookeeper、数据库），并分析各自的优缺点。',
+    category: 'microservice',
+    difficulty: 'hard',
+    answer: '分布式锁保证跨进程资源互斥。实现方式：1)Redis SETNX+过期时间（推荐Redlock算法）；2)Zookeeper临时顺序节点（CP强一致）；3)数据库唯一索引（简单但性能低）。Redis优点：性能高、实现简单；缺点：锁续期问题（需看门狗）、主从切换可能丢锁。推荐Redisson框架。',
+    codeExample: `// Redis分布式锁实现
+// 1. Redisson框架（推荐）
+// <dependency>
+//     <groupId>org.redisson</groupId>
+//     <artifactId>redisson-spring-boot-starter</artifactId>
+// </dependency>
+
+@Configuration
+public class RedissonConfig {
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer()
+            .setAddress("redis://localhost:6379")
+            .setLockWatchdogTimeout(30000);  // 看门狗30秒
+        return Redisson.create(config);
+    }
+}
+
+@Service
+public class OrderService {
+    @Autowired
+    private RedissonClient redissonClient;
+    
+    public String createOrder(Long productId) {
+        // 获取分布式锁
+        RLock lock = redissonClient.getLock("order:lock:" + productId);
+        
+        try {
+            // 尝试获取锁，最多等待10秒，锁自动释放30秒
+            boolean acquired = lock.tryLock(10, 30, TimeUnit.SECONDS);
+            if (!acquired) {
+                return "获取锁失败";
+            }
+            
+            // 执行业务逻辑
+            // 查库存、创建订单、扣库存...
+            return "订单创建成功";
+            
+        } catch (InterruptedException e) {
+            return "异常";
+        } finally {
+            // 释放锁（自动判断是否持有锁）
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+}
+
+// 2. Redis SETNX原生实现
+public class RedisLock {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    
+    public boolean tryLock(String key, String value, long expireTime) {
+        // SET key value NX EX expireTime
+        Boolean result = redisTemplate.opsForValue()
+            .setIfAbsent(key, value, expireTime, TimeUnit.SECONDS);
+        return result != null && result;
+    }
+    
+    public void unlock(String key, String value) {
+        // Lua脚本保证原子性：只有自己才能释放锁
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+                        "   return redis.call('del', KEYS[1]) " +
+                        "else " +
+                        "   return 0 " +
+                        "end";
+        redisTemplate.execute(
+            new DefaultRedisScript<>(script, Long.class),
+            Collections.singletonList(key),
+            value
+        );
+    }
+    
+    // 看门狗续期
+    public void watchdog(String key, String value, long expireTime) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(expireTime / 3);
+                    // 检查是否还持有锁
+                    if (redisTemplate.opsForValue().get(key).equals(value)) {
+                        redisTemplate.expire(key, expireTime, TimeUnit.SECONDS);
+                    } else {
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }).start();
+    }
+}
+
+// 3. Zookeeper分布式锁
+public class ZkLock {
+    private final CuratorFramework client;
+    
+    public ZkLock(CuratorFramework client) {
+        this.client = client;
+    }
+    
+    public InterProcessMutex getLock(String path) {
+        return new InterProcessMutex(client, path);
+    }
+    
+    public void doWithLock(String path, Runnable task) throws Exception {
+        InterProcessMutex lock = new InterProcessMutex(client, "/locks/" + path);
+        
+        if (lock.acquire(10, TimeUnit.SECONDS)) {
+            try {
+                task.run();
+            } finally {
+                lock.release();
+            }
+        }
+    }
+}`,
+    tags: ['分布式锁', 'Redis', 'Redisson']
+  },
+  {
+    id: 'ms-9',
+    title: '分布式ID生成方案',
+    content: '解释分布式ID的要求，列举常见的生成方案（UUID、数据库自增、Redis、Snowflake、Leaf）。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: '分布式ID要求：全局唯一、有序、高性能、可扩展。方案：1)UUID（无序、太长）；2)数据库自增（性能低、单点）；3)Redis INCR（性能高、依赖Redis）；4)Snowflake（Twitter雪花算法，64位：时间戳+机器ID+序列号）；5)Leaf（美团，号段模式+Snowflake）。推荐Snowflake或Leaf。',
+    codeExample: `// Snowflake雪花算法实现
+public class SnowflakeIdGenerator {
+    // 起始时间戳（2024-01-01）
+    private final long startTimestamp = 1704038400000L;
+    
+    // 机器ID占5位，最多32台机器
+    private final long machineIdBits = 5L;
+    private final long maxMachineId = ~(-1L << machineIdBits);  // 31
+    
+    // 序列号占12位，每毫秒最多4096个ID
+    private final long sequenceBits = 12L;
+    private final long maxSequence = ~(-1L << sequenceBits);  // 4095
+    
+    // 机器ID左移12位
+    private final long machineIdShift = sequenceBits;
+    // 时间戳左移17位
+    private final long timestampShift = sequenceBits + machineIdBits;
+    
+    private long machineId;
+    private long sequence = 0L;
+    private long lastTimestamp = -1L;
+    
+    public SnowflakeIdGenerator(long machineId) {
+        if (machineId > maxMachineId || machineId < 0) {
+            throw new IllegalArgumentException("机器ID超出范围");
+        }
+        this.machineId = machineId;
+    }
+    
+    public synchronized long nextId() {
+        long currentTimestamp = System.currentTimeMillis();
+        
+        // 时间回拨处理
+        if (currentTimestamp < lastTimestamp) {
+            throw new RuntimeException("时钟回拨");
+        }
+        
+        // 同一毫秒内
+        if (currentTimestamp == lastTimestamp) {
+            sequence = (sequence + 1) & maxSequence;
+            if (sequence == 0) {
+                // 序列号溢出，等待下一毫秒
+                currentTimestamp = waitNextMillis(lastTimestamp);
+            }
+        } else {
+            sequence = 0L;
+        }
+        
+        lastTimestamp = currentTimestamp;
+        
+        // 组装ID：时间戳 | 机器ID | 序列号
+        return ((currentTimestamp - startTimestamp) << timestampShift)
+                | (machineId << machineIdShift)
+                | sequence;
+    }
+    
+    private long waitNextMillis(long lastTimestamp) {
+        long timestamp = System.currentTimeMillis();
+        while (timestamp <= lastTimestamp) {
+            timestamp = System.currentTimeMillis();
+        }
+        return timestamp;
+    }
+}
+
+// 使用示例
+SnowflakeIdGenerator generator = new SnowflakeIdGenerator(1);
+long id = generator.nextId();  // 例如：1234567890123456789
+
+// Redis生成ID
+@Service
+public class RedisIdGenerator {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    
+    public Long nextId(String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
+    
+    // 带日期前缀的ID（便于按日期统计）
+    public String nextIdWithDate(String key) {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        Long seq = redisTemplate.opsForValue().increment(key + ":" + date);
+        return date + String.format("%06d", seq);
+    }
+}
+
+// 数据库号段模式（Leaf）
+CREATE TABLE leaf_alloc (
+    biz_tag VARCHAR(64) PRIMARY KEY,
+    max_id BIGINT NOT NULL,
+    step INT NOT NULL,
+    version INT NOT NULL
+);
+
+@Service
+public class LeafIdGenerator {
+    @Autowired
+    private LeafAllocMapper leafAllocMapper;
+    
+    private final Map<String, SegmentBuffer> buffers = new ConcurrentHashMap<>();
+    
+    public Long nextId(String bizTag) {
+        SegmentBuffer buffer = buffers.computeIfAbsent(bizTag, this::initBuffer);
+        return buffer.nextId();
+    }
+    
+    private SegmentBuffer initBuffer(String bizTag) {
+        // 从数据库获取号段
+        LeafAlloc alloc = leafAllocMapper.selectByBizTag(bizTag);
+        leafAllocMapper.updateMaxId(bizTag, alloc.getStep(), alloc.getVersion());
+        
+        return new SegmentBuffer(alloc.getMaxId(), alloc.getStep());
+    }
+}`,
+    tags: ['分布式ID', 'Snowflake', 'Leaf']
+  },
+  {
+    id: 'ms-10',
+    title: '消息队列在微服务中的应用',
+    content: '解释消息队列在微服务中的作用（解耦、异步、削峰），对比RabbitMQ、Kafka、RocketMQ的特点。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: '消息队列作用：1)解耦：服务独立演进；2)异步：提升响应速度；3)削峰：应对流量高峰。对比：RabbitMQ（AMQP协议，可靠性高，适合业务消息）；Kafka（高吞吐、持久化、适合日志大数据）；RocketMQ（阿里开源，事务消息、顺序消息）。选择：可靠性选RabbitMQ，吞吐量选Kafka。',
+    codeExample: `// RabbitMQ示例
+// 1. 配置
+@Configuration
+public class RabbitMQConfig {
+    @Bean
+    public Queue orderQueue() {
+        return new Queue("order.queue", true);
+    }
+    
+    @Bean
+    public DirectExchange orderExchange() {
+        return new DirectExchange("order.exchange");
+    }
+    
+    @Bean
+    public Binding binding() {
+        return BindingBuilder.bind(orderQueue())
+            .to(orderExchange())
+            .with("order.created");
+    }
+}
+
+// 2. 生产者
+@Service
+public class OrderProducer {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
+    public void sendOrderCreated(Order order) {
+        rabbitTemplate.convertAndSend(
+            "order.exchange",
+            "order.created",
+            order,
+            message -> {
+                message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                return message;
+            }
+        );
+    }
+}
+
+// 3. 消费者
+@Component
+@RabbitListener(queues = "order.queue")
+public class OrderConsumer {
+    @Autowired
+    private InventoryService inventoryService;
+    
+    @RabbitHandler
+    public void handleOrderCreated(Order order) {
+        // 扣减库存
+        inventoryService.decrease(order.getProductId(), order.getCount());
+    }
+}
+
+// Kafka示例
+// 1. 配置
+@Configuration
+public class KafkaConfig {
+    @Bean
+    public ProducerFactory<String, String> producerFactory() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.ACKS_CONFIG, "all");  // 确保可靠性
+        return new DefaultKafkaProducerFactory<>(config);
+    }
+    
+    @Bean
+    public KafkaTemplate<String, String> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+}
+
+// 2. 生产者
+@Service
+public class LogProducer {
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+    
+    public void sendLog(String topic, String message) {
+        kafkaTemplate.send(topic, message)
+            .addCallback(
+                result -> log.info("发送成功"),
+                ex -> log.error("发送失败", ex)
+            );
+    }
+}
+
+// 3. 消费者
+@Component
+public class LogConsumer {
+    @KafkaListener(topics = "log-topic", groupId = "log-group")
+    public void consumeLog(String message) {
+        // 处理日志
+        logService.save(message);
+    }
+    
+    // 批量消费
+    @KafkaListener(topics = "log-topic", batch = "true")
+    public void consumeBatch(List<String> messages) {
+        logService.batchSave(messages);
+    }
+}
+
+// RocketMQ事务消息
+@Service
+public class OrderTransactionProducer {
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+    
+    public void sendOrderInTransaction(Order order) {
+        rocketMQTemplate.sendMessageInTransaction(
+            "order-group",
+            MessageBuilder.withPayload(order).build(),
+            null
+        );
+    }
+}
+
+@RocketMQTransactionListener(rocketMQTemplateBeanName = "rocketMQTemplate")
+class OrderTransactionListener implements RocketMQLocalTransactionListener {
+    @Override
+    public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
+        try {
+            // 执行本地事务
+            orderService.createOrder(msg);
+            return RocketMQLocalTransactionState.COMMIT;
+        } catch (Exception e) {
+            return RocketMQLocalTransactionState.ROLLBACK;
+        }
+    }
+    
+    @Override
+    public RocketMQLocalTransactionState checkLocalTransaction(Message msg) {
+        // 事务状态回查
+        boolean exists = orderService.checkOrderExists(msg);
+        return exists ? RocketMQLocalTransactionState.COMMIT : RocketMQLocalTransactionState.ROLLBACK;
+    }
+}`,
+    tags: ['消息队列', 'RabbitMQ', 'Kafka']
+  },
+  {
+    id: 'ms-11',
+    title: '服务链路追踪',
+    content: '解释链路追踪的作用，说明Spring Cloud Sleuth + Zipkin/SkyWalking的实现原理。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: '链路追踪用于排查分布式系统问题。核心概念：Trace（完整调用链）、Span（单个服务调用）。实现原理：1)请求入口生成TraceId；2)每个服务调用生成SpanId；3)通过HTTP Header传递TraceId/SpanId；4)异步上报到收集器。常用工具：Zipkin（Twitter）、SkyWalking（Apache，无侵入）、Jaeger（Uber）。',
+    codeExample: `// Spring Cloud Sleuth + Zipkin配置
+// 1. 引入依赖
+// <dependency>
+//     <groupId>org.springframework.cloud</groupId>
+//     <artifactId>spring-cloud-starter-sleuth</artifactId>
+// </dependency>
+// <dependency>
+//     <groupId>org.springframework.cloud</groupId>
+//     <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+// </dependency>
+
+// 2. 配置
+// application.yml
+spring:
+  sleuth:
+    sampler:
+      probability: 1.0  # 采样率100%
+  zipkin:
+    base-url: http://localhost:9411
+    sender:
+      type: web  # 或kafka/rabbit
+
+// 3. 自动生成TraceId/SpanId
+// Sleuth自动在日志中添加：
+// [user-service,trace-id,span-id,parent-span-id]
+log.info("处理请求");  // 输出：[user-service,abc123,def456,null] 处理请求
+
+// 4. 手动创建Span
+@Service
+public class UserService {
+    @Autowired
+    private Tracer tracer;
+    
+    public User getUser(Long id) {
+        Span span = tracer.nextSpan().name("db-query");
+        try (Tracer.SpanInScope ws = tracer.withSpan(span.start())) {
+            return userRepository.findById(id);
+        } finally {
+            span.finish();
+        }
+    }
+}
+
+// 5. Baggage额外信息传递
+// 设置Baggage（会传递到下游服务）
+tracer.currentSpan().baggage().put("userId", "123");
+
+// 在下游服务获取
+String userId = tracer.currentSpan().baggage().get("userId");
+
+// SkyWalking配置（无侵入）
+// 1. Agent启动
+// java -javaagent=/path/to/skywalking-agent.jar 
+//      -Dskywalking.agent.service_name=user-service 
+//      -Dskywalking.collector.backend_service=localhost:11800 
+//      -jar app.jar
+
+// 2. 自定义追踪
+@Trace
+public User getUser(Long id) {
+    return userRepository.findById(id);
+}
+
+@Trace(operationName = "自定义操作")
+@Tags({
+    @Tag(key = "userId", value = "arg[0]"),
+    @Tag(key = "result", value = "returnedObj.name")
+})
+public User getUser(Long id) {
+    return userRepository.findById(id);
+}
+
+// 3. 手动埋点
+public void customTrace() {
+    AbstractSpan span = ContextManager.createLocalSpan("custom-operation");
+    try {
+        span.tag("key", "value");
+        // 业务逻辑
+    } catch (Exception e) {
+        span.errorOccurred().log(e);
+    } finally {
+        ContextManager.stopSpan();
+    }
+}`,
+    tags: ['链路追踪', 'Sleuth', 'Zipkin', 'SkyWalking']
+  },
+  {
+    id: 'ms-12',
+    title: '配置中心的作用和实现',
+    content: '解释配置中心的作用，说明Spring Cloud Config/Nacos Config的工作原理。',
+    category: 'microservice',
+    difficulty: 'medium',
+    answer: '配置中心统一管理微服务配置，支持动态更新。作用：1)配置集中管理；2)环境隔离（dev/test/prod）；3)动态刷新（无需重启）；4)版本管理。Nacos Config原理：1)服务启动从Nacos拉取配置；2)配置变更推送变更事件；3)应用监听事件刷新配置。推荐使用Nacos Config。',
+    codeExample: `// Nacos配置中心示例
+// 1. 引入依赖
+// <dependency>
+//     <groupId>com.alibaba.cloud</groupId>
+//     <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+// </dependency>
+
+// 2. bootstrap.yml配置（优先级高于application.yml）
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        shared-configs:
+          - data-id: common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+
+// 3. Nacos配置文件
+// user-service-dev.yaml
+server:
+  port: 8081
+db:
+  url: jdbc:mysql://localhost:3306/user_dev
+  username: root
+  password: root123
+
+// 4. 动态刷新配置
+@RestController
+@RefreshScope  // 支持动态刷新
+public class ConfigController {
+    @Value("\${db.url}")
+    private String dbUrl;
+    
+    @Value("\${custom.config}")
+    private String customConfig;
+    
+    @GetMapping("/config")
+    public String getConfig() {
+        return "dbUrl=" + dbUrl + ", customConfig=" + customConfig;
+    }
+    
+    // Nacos配置变更后，自动刷新，无需重启
+}
+
+// 5. 监听配置变更
+@Component
+public class ConfigChangeListener implements ApplicationListener<RefreshEvent> {
+    @Override
+    public void onApplicationEvent(RefreshEvent event) {
+        log.info("配置已刷新: {}", event);
+    }
+}
+
+// 6. 手动获取配置
+@Service
+public class ConfigService {
+    @Autowired
+    private ConfigService configService;
+    
+    public String getConfig(String dataId, String group) {
+        return configService.getConfig(dataId, group, 5000);
+    }
+    
+    public void listenConfig(String dataId, String group) {
+        configService.addListener(dataId, group, new Listener() {
+            @Override
+            public void receiveConfigInfo(String configInfo) {
+                log.info("收到配置变更: {}", configInfo);
+                // 更新本地配置
+            }
+            
+            @Override
+            public Executor getExecutor() {
+                return null;
+            }
+        });
+    }
+}
+
+// Spring Cloud Config示例（Git存储）
+// 1. 配置服务端
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication { /* ... */ }
+
+// application.yml
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/myorg/config-repo
+          search-paths: '{application}'
+          default-label: main
+
+// 2. 客户端配置
+// bootstrap.yml
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+      name: user-service
+      profile: dev
+      label: main`,
+    tags: ['配置中心', 'Nacos', '动态刷新']
   }
 ];
